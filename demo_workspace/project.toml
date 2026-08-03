@@ -1,0 +1,5 @@
+project_name = "Demo"
+source_root = "D:\\Work_Living\\Git\\FVN_translation_tools\\demo_workspace_source"
+adapter_id = "demo"
+source_language = "en"
+target_language = "zh-CN"

@@ -1,0 +1,56 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "default": "ftif-character/v1",
+      "title": "Schema",
+      "type": "string"
+    },
+    "character_id": {
+      "title": "Character Id",
+      "type": "string"
+    },
+    "names": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Names",
+      "type": "array"
+    },
+    "description": {
+      "default": "",
+      "title": "Description",
+      "type": "string"
+    },
+    "speech_style": {
+      "default": "",
+      "title": "Speech Style",
+      "type": "string"
+    },
+    "evidence_unit_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Unit Ids",
+      "type": "array"
+    },
+    "confirmed": {
+      "default": false,
+      "title": "Confirmed",
+      "type": "boolean"
+    },
+    "version": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "character_id",
+    "names"
+  ],
+  "title": "Character",
+  "type": "object",
+  "$id": "https://fvn-translator.local/schemas/ftif-character-v1.schema.json"
+}

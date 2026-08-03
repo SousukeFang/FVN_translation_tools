@@ -1,0 +1,10 @@
+project_name = "Remember the Flowers - Part II"
+source_root = "D:/Games/RememberTheFlowersII-0.02-win"
+adapter_id = "renpy"
+source_language = "en"
+target_language = "zh-CN"
+
+[adapter_options]
+profile_id = "remember-the-flowers-ii"
+lint_enabled = false
+full_staging = false

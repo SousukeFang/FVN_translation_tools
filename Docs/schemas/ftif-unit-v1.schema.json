@@ -1,0 +1,291 @@
+{
+  "$defs": {
+    "ApplyState": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/ApplyStatus",
+          "default": "not_applied"
+        },
+        "applied_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Applied At"
+        }
+      },
+      "title": "ApplyState",
+      "type": "object"
+    },
+    "ApplyStatus": {
+      "enum": [
+        "not_applied",
+        "applied",
+        "apply_failed"
+      ],
+      "title": "ApplyStatus",
+      "type": "string"
+    },
+    "TranslationState": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/TranslationStatus",
+          "default": "pending"
+        },
+        "origin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Origin"
+        },
+        "provider": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Provider"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "prompt_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Prompt Version"
+        },
+        "translated_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Translated At"
+        }
+      },
+      "title": "TranslationState",
+      "type": "object"
+    },
+    "TranslationStatus": {
+      "enum": [
+        "pending",
+        "in_progress",
+        "translated",
+        "reviewed",
+        "skipped",
+        "failed"
+      ],
+      "title": "TranslationStatus",
+      "type": "string"
+    },
+    "UnitType": {
+      "enum": [
+        "dialogue",
+        "dialogue_extension",
+        "narration",
+        "screen_text",
+        "menu_choice",
+        "ui_text",
+        "ui_button",
+        "character_name",
+        "notification",
+        "input_prompt",
+        "accessibility_text",
+        "other_visible_text"
+      ],
+      "title": "UnitType",
+      "type": "string"
+    },
+    "ValidationState": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/ValidationStatus",
+          "default": "unchecked"
+        },
+        "issue_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Issue Ids",
+          "type": "array"
+        }
+      },
+      "title": "ValidationState",
+      "type": "object"
+    },
+    "ValidationStatus": {
+      "enum": [
+        "unchecked",
+        "passed",
+        "warning",
+        "failed"
+      ],
+      "title": "ValidationStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "default": "ftif-unit/v1",
+      "title": "Schema",
+      "type": "string"
+    },
+    "unit_id": {
+      "title": "Unit Id",
+      "type": "string"
+    },
+    "sequence": {
+      "minimum": 0,
+      "title": "Sequence",
+      "type": "integer"
+    },
+    "segment_id": {
+      "title": "Segment Id",
+      "type": "string"
+    },
+    "scene_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Scene Id"
+    },
+    "type": {
+      "$ref": "#/$defs/UnitType"
+    },
+    "speaker": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Speaker"
+    },
+    "source_text": {
+      "title": "Source Text",
+      "type": "string"
+    },
+    "target_text": {
+      "default": "",
+      "title": "Target Text",
+      "type": "string"
+    },
+    "source_fingerprint": {
+      "title": "Source Fingerprint",
+      "type": "string"
+    },
+    "protected_tokens": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Protected Tokens",
+      "type": "array"
+    },
+    "context": {
+      "additionalProperties": true,
+      "title": "Context",
+      "type": "object"
+    },
+    "origin": {
+      "additionalProperties": true,
+      "title": "Origin",
+      "type": "object"
+    },
+    "constraints": {
+      "additionalProperties": true,
+      "title": "Constraints",
+      "type": "object"
+    },
+    "translation": {
+      "$ref": "#/$defs/TranslationState"
+    },
+    "validation": {
+      "$ref": "#/$defs/ValidationState"
+    },
+    "apply": {
+      "$ref": "#/$defs/ApplyState"
+    },
+    "adapter_data": {
+      "additionalProperties": true,
+      "title": "Adapter Data",
+      "type": "object"
+    },
+    "revision": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Revision",
+      "type": "integer"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "unit_id",
+    "sequence",
+    "segment_id",
+    "type",
+    "source_text",
+    "source_fingerprint"
+  ],
+  "title": "TranslationUnit",
+  "type": "object",
+  "$id": "https://fvn-translator.local/schemas/ftif-unit-v1.schema.json"
+}

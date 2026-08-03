@@ -1,0 +1,1 @@
+TRANSLATION_FUNCTIONS = ("_", "__")

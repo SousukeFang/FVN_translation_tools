@@ -1,0 +1,5 @@
+project_name = "Demo Example"
+source_root = "../demo_source"
+adapter_id = "demo"
+source_language = "en"
+target_language = "zh-CN"

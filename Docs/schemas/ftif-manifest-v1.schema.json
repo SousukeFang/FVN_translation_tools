@@ -1,0 +1,79 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "default": "ftif-manifest/v1",
+      "title": "Schema",
+      "type": "string"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "project_name": {
+      "title": "Project Name",
+      "type": "string"
+    },
+    "source_language": {
+      "default": "en",
+      "title": "Source Language",
+      "type": "string"
+    },
+    "target_language": {
+      "default": "zh-CN",
+      "title": "Target Language",
+      "type": "string"
+    },
+    "source_format": {
+      "title": "Source Format",
+      "type": "string"
+    },
+    "adapter_id": {
+      "title": "Adapter Id",
+      "type": "string"
+    },
+    "adapter_version": {
+      "title": "Adapter Version",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "source_root": {
+      "title": "Source Root",
+      "type": "string"
+    },
+    "prompt_versions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Prompt Versions",
+      "type": "object"
+    },
+    "schema_versions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Schema Versions",
+      "type": "object"
+    }
+  },
+  "required": [
+    "project_id",
+    "project_name",
+    "source_format",
+    "adapter_id",
+    "adapter_version",
+    "source_root"
+  ],
+  "title": "Manifest",
+  "type": "object",
+  "$id": "https://fvn-translator.local/schemas/ftif-manifest-v1.schema.json"
+}

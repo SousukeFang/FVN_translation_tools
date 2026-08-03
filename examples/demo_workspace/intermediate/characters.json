@@ -1,0 +1,12 @@
+[
+  {
+    "schema": "ftif-character/v1",
+    "character_id": "lance",
+    "names": ["Lance"],
+    "description": "Demo character",
+    "speech_style": "",
+    "evidence_unit_ids": ["demo-dialogue-2"],
+    "confirmed": true,
+    "version": 1
+  }
+]

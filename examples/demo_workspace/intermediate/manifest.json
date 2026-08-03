@@ -1,0 +1,19 @@
+{
+  "schema": "ftif-manifest/v1",
+  "project_id": "demo-example",
+  "project_name": "Demo Example",
+  "source_language": "en",
+  "target_language": "zh-CN",
+  "source_format": "demo",
+  "adapter_id": "demo",
+  "adapter_version": "1.0.0",
+  "created_at": "2026-08-02T00:00:00Z",
+  "updated_at": "2026-08-02T00:00:00Z",
+  "source_root": "../demo_source",
+  "prompt_versions": {
+    "translation": "translation-v1"
+  },
+  "schema_versions": {
+    "ftif": "v1"
+  }
+}

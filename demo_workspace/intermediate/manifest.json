@@ -1,0 +1,21 @@
+{
+  "schema": "ftif-manifest/v1",
+  "project_id": "c89d42641e5f433babb8aef340b499ab",
+  "project_name": "Demo",
+  "source_language": "en",
+  "target_language": "zh-CN",
+  "source_format": "demo",
+  "adapter_id": "demo",
+  "adapter_version": "1.0.0",
+  "created_at": "2026-08-03T06:57:06.345971Z",
+  "updated_at": "2026-08-03T06:57:06.345974Z",
+  "source_root": "D:\\Work_Living\\Git\\FVN_translation_tools\\demo_workspace_source",
+  "prompt_versions": {
+    "translation": "translation-v1",
+    "metadata": "metadata-v1",
+    "summary": "summary-v1"
+  },
+  "schema_versions": {
+    "ftif": "v1"
+  }
+}

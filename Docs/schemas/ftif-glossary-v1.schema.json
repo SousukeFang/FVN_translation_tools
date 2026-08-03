@@ -1,0 +1,65 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "default": "ftif-glossary/v1",
+      "title": "Schema",
+      "type": "string"
+    },
+    "term_id": {
+      "title": "Term Id",
+      "type": "string"
+    },
+    "source_term": {
+      "title": "Source Term",
+      "type": "string"
+    },
+    "target_term": {
+      "default": "",
+      "title": "Target Term",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "title": "Description",
+      "type": "string"
+    },
+    "case_sensitive": {
+      "default": false,
+      "title": "Case Sensitive",
+      "type": "boolean"
+    },
+    "evidence_unit_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Unit Ids",
+      "type": "array"
+    },
+    "alternatives": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Alternatives",
+      "type": "array"
+    },
+    "confirmed": {
+      "default": false,
+      "title": "Confirmed",
+      "type": "boolean"
+    },
+    "version": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "term_id",
+    "source_term"
+  ],
+  "title": "GlossaryEntry",
+  "type": "object",
+  "$id": "https://fvn-translator.local/schemas/ftif-glossary-v1.schema.json"
+}
