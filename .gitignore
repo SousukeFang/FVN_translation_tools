@@ -1,0 +1,4 @@
+﻿# 忽略 plan 目录、Agents 文件和 trash 目录
+plan/
+Agents.md
+trash/
