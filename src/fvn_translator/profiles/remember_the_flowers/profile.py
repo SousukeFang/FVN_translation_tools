@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 from fvn_translator.adapters.base import ValidationReport
@@ -17,10 +18,13 @@ from .config import FILE_RULES, SCENE_RULES
 from .custom_statements import CUSTOM_TEXT_SINKS
 from .validation_rules import REQUIRED_PROJECT_FILES
 
+ATTRIBUTION_LINK = re.compile(r"\{a=(https?://[^}]+)\}(.*?)\{/a\}", re.DOTALL)
+ATTRIBUTION_AUTHOR = re.compile(r"\bby\s+([^{}\n]+?)(?=\n|$)")
+
 
 class RememberTheFlowersProfile:
     profile_id = "remember-the-flowers-ii"
-    profile_version = "1.0.0"
+    profile_version = "1.1.0"
     engine_adapter_id = "renpy"
 
     def detect(self, source_root: Path) -> ProfileDetectionResult:
@@ -53,6 +57,30 @@ class RememberTheFlowersProfile:
         return ProtectedTokenRules()
 
     def enrich_unit(self, unit: TranslationUnit, context: ParseContext) -> TranslationUnit:
+        protected = list(unit.protected_tokens)
+        prefix = str(unit.adapter_data.get("statement_prefix", "")).strip()
+        music_title = (
+            context.relative_path == "game/music_display.rpy"
+            and unit.adapter_data.get("function") in {"_", "__"}
+        ) or (
+            context.relative_path == "game/music_room/music_room.rpy"
+            and re.match(r"(?:name|description)\s*=\s*__?\($", prefix)
+            and unit.source_text != "Unreleased"
+        )
+        if music_title:
+            protected.append(unit.source_text)
+            unit.context["preserve_original"] = "Music or album title"
+        if context.relative_path in {"game/screens.rpy", "game/extras.rpy"}:
+            protected.extend(
+                match.group(2)
+                for match in ATTRIBUTION_LINK.finditer(unit.source_text)
+                if re.match(r"https?://(?:x\.com|twitter\.com|bsky\.app)/", match.group(1))
+                or re.search(r"\bby\s*$", unit.source_text[: match.start()])
+            )
+            protected.extend(
+                match.group(1).strip() for match in ATTRIBUTION_AUTHOR.finditer(unit.source_text)
+            )
+        unit.protected_tokens = list(dict.fromkeys(token for token in protected if token))
         return unit
 
     def validate_project(

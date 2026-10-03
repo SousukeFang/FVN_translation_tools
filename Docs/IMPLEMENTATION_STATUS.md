@@ -13,8 +13,12 @@ FTIF Schema 示例全部通过。独立 Agent 按 skill 执行日文 Ren’Py→
 text-spans→法语与 Part II 合成 fixture 三条端到端流程，均完成批次交换、校验和打包。
 前两条还核对 BOM、CRLF、非剧情内容、附件和哈希，重复导入与续传正常。
 
-真实 Windows 安装包尚未取得，正式汉化没有开始；字体、SDK lint、启动测试及下载 Page
-留待下一任务。用户本轮要求先提交开发成果，后续见 [交接文档](HANDOFF.md)。
+正式 Windows 0.02 Demo en→zh-CN 汉化已完成：2,004 个非空单元全部导入，
+其中剧情 1,511 个、角色显示名 90 个；另补充 66 条引擎 UI 文案。ATL、跨行资源、
+动态 screen 误提取与空白 spacer 已修复，Part II Profile 1.1.0 保留曲目和署名。
+本轮全质量门禁及 75 项离线测试通过。正文 staging 校验无错误；匹配 Linux 8.5.3
+引擎运行 Windows 游戏脚本，中文字体/常用提示映射和 1,509 个普通剧情单元渲染通过。
+已创建下载 Page；Windows EXE 本机启动未实测。成品和验证记录见 [交接文档](HANDOFF.md)。
 
 ## Gate A 状态
 

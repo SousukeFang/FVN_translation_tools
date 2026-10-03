@@ -77,7 +77,7 @@ def test_profile_detection_character_map_and_real_samples() -> None:
     adapter = RenPyAdapter()
     config = AdapterConfig(options={"profile_id": profile.profile_id})
     result = adapter.extract(source, adapter.discover_files(source, config), config)
-    assert len(result.units) == 9
+    assert len(result.units) == 12
     touching = next(unit for unit in result.units if unit.source_text == "{i}Damnit...{/i}")
     assert touching.speaker == "Lan2"
     assert touching.adapter_data["speaker_attributes"] == [
@@ -132,7 +132,7 @@ def test_profile_reports_unknown_say_like_statement(tmp_path: Path) -> None:
     adapter = RenPyAdapter()
     config = AdapterConfig(options={"profile_id": "remember-the-flowers-ii"})
     result = adapter.extract(source, adapter.discover_files(source, config), config)
-    assert not result.units
+    assert [unit.source_text for unit in result.units] == ["Fox"]
     assert [issue.code for issue in result.issues] == ["RENPY_UNKNOWN_TEXT_SINK"]
 
 
@@ -144,6 +144,161 @@ def test_custom_sink_can_select_nonzero_literal_argument() -> None:
         custom_sinks=[CustomTextSink(function="visible", argument=1, unit_type=UnitType.UI_TEXT)]
     ).parse('$ visible("internal", "Player text")\n', "game/test.rpy")
     assert [node.token.value for node in parsed.nodes] == ["Player text"]
+
+
+def test_atl_and_multiline_resource_expressions_are_not_narration() -> None:
+    from fvn_translator.adapters.renpy.parser import RenPyParser
+
+    parsed = RenPyParser().parse(
+        "image walker:\n"
+        '    "images/walk.png"\n'
+        "    choice:\n"
+        '        "walker_idle"\n'
+        "layeredimage person:\n"
+        "    group movement:\n"
+        "        attribute idle:\n"
+        '            "person_idle"\n'
+        "transform animation:\n"
+        '    "image_reference"\n'
+        "image thumbnail = im.MatrixColor(\n"
+        '    "images/thumb.png",\n'
+        "    im.matrix.saturation(0.0))\n"
+        "label start:\n"
+        "    show sprite:\n"
+        '        "sprite_idle"\n'
+        '    "Actual narration."\n'
+        '    show text "Actual title.":\n'
+        "        yalign 0.5\n",
+        "game/test.rpy",
+    )
+    assert [node.token.value for node in parsed.nodes] == [
+        "Actual narration.",
+        "Actual title.",
+    ]
+
+
+def test_dynamic_screen_text_does_not_extract_style_or_action_arguments() -> None:
+    from fvn_translator.adapters.renpy.parser import RenPyParser
+
+    parsed = RenPyParser().parse(
+        "screen test():\n"
+        '    text prompt style "input_prompt"\n'
+        '    text song.name layout "nobreak" color "#ffffff"\n'
+        '    textbutton item.caption action ShowMenu("internal_screen")\n'
+        '    text "Visible" style "internal_style"\n'
+        '    text _("Translated") layout "nobreak"\n',
+        "game/test.rpy",
+    )
+    assert [node.token.value for node in parsed.nodes] == ["Visible", "Translated"]
+
+
+def test_empty_visible_spacers_are_not_translation_units_and_remain_unchanged(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    script = source / "game/script.rpy"
+    script.parent.mkdir(parents=True)
+    original = (
+        "label start:\r\n"
+        '    ""\r\n'
+        '    "   "\r\n'
+        '    "Visible narration."\r\n'
+        "screen test():\r\n"
+        '    text ""\r\n'
+        '    text "\\t"\r\n'
+        '    textbutton _(" ") action Return()\r\n'
+        '    text "Visible UI."\r\n'
+    )
+    script.write_bytes(original.encode("utf-8"))
+    adapter = RenPyAdapter()
+    config = AdapterConfig()
+    result = adapter.extract(source, adapter.discover_files(source, config), config)
+    assert [unit.source_text for unit in result.units] == ["Visible narration.", "Visible UI."]
+    for unit in result.units:
+        unit.target_text = f"译文：{unit.source_text}"
+    staging = tmp_path / "staging"
+    adapter.apply(source, staging, result.units, config)
+    actual = (staging / "game/script.rpy").read_bytes()
+    expected = original.replace('"Visible narration."', '"译文：Visible narration."').replace(
+        '"Visible UI."', '"译文：Visible UI."'
+    )
+    assert actual == expected.encode("utf-8")
+    assert not adapter.validate(staging, result.units, config).has_errors
+
+
+def test_profile_extracts_literal_character_names_without_resource_keywords(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    names = source / "game/characters/names.rpy"
+    names.parent.mkdir(parents=True)
+    names.write_text(
+        'define base = Character(ctc=Blink("images/ctc.webp"))\n'
+        'define named = Character("Lance", image="lance")\n'
+        'define combined = Character(color="#fff", name="Lance and Cyrus")\n'
+        'define dynamic = Character(player_name, dynamic=True, image="internal")\n'
+        'define nameless = Character("", color="#fff")\n'
+        'define blank = Character(name="   ", color="#fff")\n'
+        '$ named = Character("Captain", color="#fff")\n',
+        encoding="utf-8",
+    )
+    adapter = RenPyAdapter()
+    config = AdapterConfig(options={"profile_id": "remember-the-flowers-ii"})
+    result = adapter.extract(source, adapter.discover_files(source, config), config)
+    assert [unit.source_text for unit in result.units] == [
+        "Lance",
+        "Lance and Cyrus",
+        "Captain",
+    ]
+    assert all(unit.type == UnitType.CHARACTER_NAME for unit in result.units)
+    for unit in result.units:
+        unit.target_text = f"译文：{unit.source_text}"
+    staging = tmp_path / "staging"
+    adapter.apply(source, staging, result.units, config)
+    assert not adapter.validate(staging, result.units, config).has_errors
+
+
+def test_profile_protects_music_titles_and_credit_hyperlink_labels(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    files = {
+        "game/music_display.rpy": 'define MUSIC_LOOKUP = {"track": _("Lotus Seeds")}\n',
+        "game/music_room/music_room.rpy": (
+            "init python:\n"
+            "    music_room.add(\n"
+            '        name=_("Lotus Seeds"),\n'
+            '        artist="Artist Handle",\n'
+            '        description=_("Album (2025)"),\n'
+            "    )\n"
+            "screen test():\n"
+            '    text _("No song playing")\n'
+        ),
+        "game/screens.rpy": (
+            'screen about():\n    text "{a=https://x.com/artist}Artist Handle{/a} - Writer"\n'
+            '    text "{a=https://example.com/sound}Sound Title{/a} by Artist Handle\\n"\n'
+            "screen help():\n"
+            '    text "Enable {a=https://www.renpy.org/l/voicing}self-voicing{/a}."\n'
+        ),
+    }
+    for relative, text in files.items():
+        path = source / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+    adapter = RenPyAdapter()
+    config = AdapterConfig(options={"profile_id": "remember-the-flowers-ii"})
+    result = adapter.extract(source, adapter.discover_files(source, config), config)
+    titles = [unit for unit in result.units if unit.source_text in {"Lotus Seeds", "Album (2025)"}]
+    assert len(titles) == 3
+    assert all(unit.source_text in unit.protected_tokens for unit in titles)
+    message = next(unit for unit in result.units if unit.source_text == "No song playing")
+    assert message.source_text not in message.protected_tokens
+    credit = next(unit for unit in result.units if " - Writer" in unit.source_text)
+    assert "Artist Handle" in credit.protected_tokens
+    assert not any(unit.source_text == "Artist Handle" for unit in result.units)
+    sound_credit = next(unit for unit in result.units if "Sound Title" in unit.source_text)
+    assert "Artist Handle" in sound_credit.protected_tokens
+    assert "Sound Title" not in sound_credit.protected_tokens
+    help_text = next(unit for unit in result.units if "self-voicing" in unit.source_text)
+    assert "self-voicing" not in help_text.protected_tokens
 
 
 def test_round_trip_preserves_bom_crlf_and_structure(tmp_path: Path) -> None:

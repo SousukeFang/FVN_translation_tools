@@ -34,6 +34,7 @@ class CharacterDefinition(ProfileModel):
 class CustomTextSink(ProfileModel):
     function: str
     argument: int = Field(default=0, ge=0)
+    keyword: str | None = None
     unit_type: UnitType = UnitType.OTHER_VISIBLE_TEXT
 
 

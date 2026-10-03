@@ -21,6 +21,9 @@ from .statements import (
 LABEL = re.compile(r"^\s*label\s+(?P<name>[A-Za-z_]\w*)\s*:")
 SCREEN = re.compile(r"^\s*screen\s+[A-Za-z_]\w*")
 PYTHON_BLOCK = re.compile(r"^\s*(?:init(?:\s+-?\d+)?\s+)?python(?:\s+early)?\s*:", re.IGNORECASE)
+ATL_BLOCK = re.compile(
+    r"^\s*(?:image|layeredimage|transform|show|scene|camera)\b.*:\s*(?:#.*)?$", re.IGNORECASE
+)
 NON_TEXT_STATEMENTS = frozenset(
     {
         "background",
@@ -126,17 +129,20 @@ class RenPyParser:
         for token in lexed.strings:
             tokens_by_line.setdefault(token.start_line, []).append(token)
         comments = {token.line: token.text.strip() for token in lexed.comments}
+        delimiter_depths = _delimiter_depths(text, lexed.strings)
         label = "<file>"
         scene_index = 0
         screen_indent: int | None = None
         menu_indent: int | None = None
         python_indent: int | None = None
+        atl_indent: int | None = None
         visible_index = 0
         previous_dialogue_index: int | None = None
         for line_number, raw_line in enumerate(lines, 1):
             line = raw_line.rstrip("\r\n")
             stripped = line.lstrip(" \t")
             indent = len(line) - len(stripped)
+            in_continuation = delimiter_depths[line_number - 1] > 0
             if stripped and not stripped.startswith("#"):
                 if screen_indent is not None and indent <= screen_indent and not SCREEN.match(line):
                     screen_indent = None
@@ -152,6 +158,8 @@ class RenPyParser:
                     and not PYTHON_BLOCK.match(line)
                 ):
                     python_indent = None
+                if atl_indent is not None and indent <= atl_indent:
+                    atl_indent = None
             label_match = LABEL.match(line)
             if label_match:
                 label = label_match.group("name")
@@ -162,6 +170,8 @@ class RenPyParser:
                 menu_indent = indent
             if PYTHON_BLOCK.match(line):
                 python_indent = indent
+            if ATL_BLOCK.match(line) and atl_indent is None:
+                atl_indent = indent
             if re.match(r"^\s*scene\s+\S", line):
                 scene_index += 1
             if self._structured_scene(comments.get(line_number, "")):
@@ -186,9 +196,13 @@ class RenPyParser:
                 menu_indent is not None and indent > menu_indent,
                 python_indent is not None and indent > python_indent,
                 previous_dialogue_index,
+                atl_indent is not None and indent > atl_indent,
+                in_continuation,
             )
             if classified:
                 for node in classified:
+                    if not node.token.value.strip():
+                        continue
                     if any(prefix in node.token.prefix.lower() for prefix in ("f", "b")):
                         result.issues.append(
                             Issue(
@@ -245,6 +259,8 @@ class RenPyParser:
         in_menu: bool,
         in_python: bool,
         previous_dialogue_index: int | None,
+        in_atl: bool,
+        in_continuation: bool,
     ) -> list[TextNode]:
         base: NodeBase = {
             "statement_start": statement_start,
@@ -264,20 +280,22 @@ class RenPyParser:
         if in_screen:
             keyword = stripped.split(None, 1)[0] if stripped else ""
             if keyword in SCREEN_KEYWORDS and not (keyword == "label" and stripped.endswith(":")):
-                return [
-                    TextNode(
-                        kind=f"screen_{keyword}",
-                        unit_type=SCREEN_KEYWORDS[keyword],
-                        token=first,
-                        **base,
-                    )
-                ]
+                expression_start = line_absolute + line.find(keyword) + len(keyword)
+                if not text[expression_start : first.start].strip():
+                    return [
+                        TextNode(
+                            kind=f"screen_{keyword}",
+                            unit_type=SCREEN_KEYWORDS[keyword],
+                            token=first,
+                            **base,
+                        )
+                    ]
         if in_menu and prefix == "" and is_menu_choice_suffix(text[first.end : statement_end]):
             return [TextNode(kind="menu", unit_type=UnitType.MENU_CHOICE, token=first, **base)]
         function_nodes = self._function_nodes(text, tokens, base)
         if function_nodes:
             return function_nodes
-        if in_python:
+        if in_python or in_screen or in_atl or in_continuation:
             return []
         if prefix == "" and len(tokens) >= 2:
             between = text[first.end : tokens[1].start]
@@ -342,6 +360,7 @@ class RenPyParser:
                     statement_start=base["statement_start"],
                     statement_end=base["statement_end"],
                     strings=tokens,
+                    keyword=sink.keyword,
                 )
                 if argument == sink.argument:
                     nodes.append(
@@ -350,7 +369,10 @@ class RenPyParser:
                             unit_type=sink.unit_type,
                             token=token,
                             text_role=f"argument-{sink.argument}",
-                            context={"function": sink.function},
+                            context={
+                                "function": sink.function,
+                                "statement_prefix": text[base["statement_start"] : token.start],
+                            },
                             **base,
                         )
                     )
@@ -436,3 +458,19 @@ def _line_starts(text: str) -> list[int]:
 def _statement_end(text: str, starts: list[int], tokens: list[StringToken]) -> int:
     last_line = max(token.end_line for token in tokens)
     return starts[last_line] if last_line < len(starts) else len(text)
+
+
+def _delimiter_depths(text: str, tokens: list[StringToken]) -> list[int]:
+    """Track expression continuation without counting literals or comments."""
+    rendered = list(text)
+    for token in tokens:
+        for index in range(token.start, token.end):
+            if rendered[index] not in "\r\n":
+                rendered[index] = " "
+    depth = 0
+    depths = []
+    for line in "".join(rendered).splitlines():
+        depths.append(depth)
+        code = line.split("#", 1)[0]
+        depth += sum(code.count(char) for char in "([{") - sum(code.count(char) for char in ")]}")
+    return depths

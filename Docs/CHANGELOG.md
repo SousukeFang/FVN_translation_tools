@@ -22,3 +22,10 @@
 - 建立 FTIF v1 公共模型、工作区与可重建状态存储。
 - 增加 Provider、翻译编排、缓存、修订、校验、备份、Apply 与 Rollback。
 - 增加 Adapter SDK、DemoAdapter、Textual TUI 和公共文档。
+
+## 2026-10-03 Part II 正式汉化
+
+- 从 origin/work 最新代码继续，完成 Windows 0.02 Demo 英语到简体中文翻译及审校；游戏和译文保留在忽略目录。
+- 修复 Ren’Py ATL/跨行资源/动态 screen 误提取，补齐 Character 显示名，排除空白可见节点，精确保护曲目与真实署名。
+- 最终提取 2,004 个非空单元；另补充 66 条常用引擎提示和日期/无障碍文案。提供中文字体、版本对应补丁、安装恢复说明和下载 Page。
+- Ruff、格式、Pyright、75 项离线测试与 Schema 示例通过；matching Linux 8.5.3 引擎检查 Windows 脚本，Windows EXE 本机启动仍待验证。

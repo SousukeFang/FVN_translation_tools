@@ -30,7 +30,11 @@ def test_remember_the_flowers_fixture_end_to_end_without_llm(tmp_path: Path) -> 
         unit.target_text = f"译文：{unit.source_text}"
     staging = tmp_path / "staging"
     applied = adapter.apply(source, staging, first.units, config)
-    assert applied.written_files == ["game/options.rpy", "game/story/prologue.rpy"]
+    assert applied.written_files == [
+        "game/characters/names.rpy",
+        "game/options.rpy",
+        "game/story/prologue.rpy",
+    ]
     assert not adapter.validate(staging, first.units, config).has_errors
     second = adapter.extract(staging, adapter.discover_files(staging, config), config)
     assert [unit.unit_id for unit in first.units] == [unit.unit_id for unit in second.units]
@@ -62,7 +66,7 @@ def test_public_pipeline_backup_apply_and_rollback(tmp_path: Path) -> None:
     database = StateDatabase(workspace.state / "state.sqlite3")
     repository = UnitRepository(workspace.intermediate / "units.jsonl", database)
     config = AdapterConfig(options=project_config.adapter_options)
-    assert ExtractionService(adapter, repository).extract(source, config) == 9
+    assert ExtractionService(adapter, repository).extract(source, config) == 12
     translation = TranslationService(
         MockProvider(),
         repository,
