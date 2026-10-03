@@ -15,3 +15,12 @@ providers.toml
 .env
 trash/
 /requirements.txt
+
+# Agent 翻译的本地下载、游戏、批次和交付物
+/work/
+/output/
+/downloads/
+/games/
+/patches/
+/demo_workspace/
+/demo_workspace_source/

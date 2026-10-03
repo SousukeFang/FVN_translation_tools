@@ -2,6 +2,8 @@
 
 处理链路是：`源文件 → Adapter.extract → FTIF → 公共服务/Provider → Adapter.apply(staging) → 校验 → 备份 → 原子替换`。
 
+Agent 模式使用同一 FTIF 和 Adapter：`源文件 → 抽取 → 导出任务 → Agent 译文响应 → 导入与 revision → staging → 校验 → 补丁 ZIP 与说明`。它不调用 Provider，也不运行替换正式源文件的 ApplyService。
+
 模块职责：
 
 | 层 | 目录 | 责任 | 禁止事项 |

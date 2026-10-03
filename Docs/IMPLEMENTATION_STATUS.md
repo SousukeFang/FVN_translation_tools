@@ -1,6 +1,20 @@
 # 实现状态
 
-更新时间：2026-08-03
+更新时间：2026-10-03
+
+## Agent 翻译模式
+
+已完成非 API 的 Agent 批次交换、任意语言参数、精确文本区间 Adapter、补丁打包和
+`skills/fvn-translate/`。CLI 支持 prepare、export、import、status、validate、package。
+安装补丁只包含改变的脚本和显式附件，原游戏目录不被修改。
+
+本轮在 Linux / Python 3.12 / uv 环境验证：Ruff、格式检查、Pyright、70 项离线测试和
+FTIF Schema 示例全部通过。独立 Agent 按 skill 执行日文 Ren’Py→法语、通用
+text-spans→法语与 Part II 合成 fixture 三条端到端流程，均完成批次交换、校验和打包。
+前两条还核对 BOM、CRLF、非剧情内容、附件和哈希，重复导入与续传正常。
+
+真实 Windows 安装包尚未取得，正式汉化没有开始；字体、SDK lint、启动测试及下载 Page
+留待下一任务。用户本轮要求先提交开发成果，后续见 [交接文档](HANDOFF.md)。
 
 ## Gate A 状态
 

@@ -252,6 +252,7 @@ class TranslatorApp(App[None]):
     async def translate_worker(self) -> None:
         if not self.repository or not self.workspace or not self.database:
             return
+        config, _ = self._config()
         provider_name = str(self.query_one("#provider", Select).value)
         provider = create_provider(self.providers.providers[provider_name])
         service = TranslationService(
@@ -276,7 +277,11 @@ class TranslatorApp(App[None]):
             self.repository,
             self.workspace.intermediate / "scene_summaries.jsonl",
         )
-        await pipeline.run(progress=update)
+        await pipeline.run(
+            progress=update,
+            source_language=config.source_language,
+            target_language=config.target_language,
+        )
         self.refresh_units()
 
     @on(Button.Pressed, "#metadata")

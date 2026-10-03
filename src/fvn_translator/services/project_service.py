@@ -2,6 +2,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from fvn_translator.config import ProjectConfig, write_project_config
+from fvn_translator.llm.request_builder import TRANSLATION_PROMPT_VERSION
 from fvn_translator.models import Manifest
 from fvn_translator.storage import Workspace
 
@@ -22,7 +23,7 @@ class ProjectService:
             adapter_version=adapter_version,
             source_root=str(config.source_root.resolve()),
             prompt_versions={
-                "translation": "translation-v1",
+                "translation": TRANSLATION_PROMPT_VERSION,
                 "metadata": "metadata-v1",
                 "summary": "summary-v1",
             },

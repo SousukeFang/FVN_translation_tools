@@ -1,6 +1,6 @@
 ﻿# 项目说明
 
-本项目是基于 FTIF v1 的可扩展 FVN LLM 翻译工具。公共层负责 TUI、Provider、翻译编排、中间文件、断点与缓存、校验、备份、Apply 和 Rollback；各游戏格式通过 Adapter 接入，LLM 不直接修改源文件。
+本项目是基于 FTIF v1 的可扩展 FVN 翻译工具，支持 API/TUI 和 Agent 直接翻译两种模式。公共层负责编排、中间文件、断点、校验、备份、Apply/Rollback 与补丁打包；各游戏格式通过 Adapter 接入，LLM 不直接修改源文件。
 
 开始工作前先阅读：
 
@@ -11,6 +11,9 @@
 - [翻译流水线](Docs/06-translation-pipeline.md)
 - [仓库目录与追踪规则](Docs/11-repository-layout.md)
 - [实现状态与 Gate A](Docs/IMPLEMENTATION_STATUS.md)
+- [Agent 翻译模式](Docs/12-agent-translation.md)
+
+Agent 直接翻译游戏时加载 [FVN 翻译 skill](skills/fvn-translate/SKILL.md)，只读取匹配的 reference。待继续的 Part II 汉化见 [交接文档](Docs/HANDOFF.md)。
 
 # Agents 运行规范
 
@@ -39,12 +42,18 @@
    - 测试必须离线，不得调用付费 LLM。
 
 7. 模块边界与数据安全
-   - 公共包放在 `src/fvn_translator/`；`scripts/` 仅放维护命令。
+   - 公共包放在 `src/fvn_translator/`；根 `scripts/` 仅放维护命令，skill 自带 `scripts/` 只做确定性操作或公共命令入口。
    - TUI 调用 Service，Service 通过 Repository 持久化；Adapter 不调用 LLM，LLM 不接收 `adapter_data`。
    - 权威 JSON/JSONL 必须原子写入；所有人工或自动译文修改必须留下 revision；源文件替换前必须备份并检查哈希冲突。
 
 8. Adapter 扩展
    - 公共 Adapter 放在 `src/fvn_translator/adapters/<adapter_id>/`，游戏专属配置和样本可放在对应 FVN 目录。
    - 新 Adapter 必须遵循 `Docs/04-adapter-contract.md` 并通过公共契约测试。
-   - Gate A 未确认前禁止实现正式 Ren’Py 解析、回写或特有校验；
-   - 当前 FVN 目标为 Remember The Flower。
+   - 当前已进入 Ren’Py 与 Agent 翻译阶段；历史 Gate A/B 的人工演示缺口记录在实现状态中。
+   - 当前 FVN 目标为 Remember the Flowers - Part II。
+
+9. Agent 翻译与交付
+   - `skills/fvn-translate/SKILL.md` 保留核心流程；每个游戏的翻译与打包要求放独立 reference。
+   - Agent 只输出任务对应译文，程序导入 FTIF、追加 revision、校验和打包；不通过 Provider/API 翻译。
+   - 下载、原游戏、译文、运行记录放忽略的 `work/`；补丁和说明放忽略的 `output/`。这些产物不提交到仓库。
+   - 未收录的 Ren’Py 使用通用 Adapter；其他可读 UTF-8 格式使用明确剧情 span map，不扫描所有引号猜剧情。

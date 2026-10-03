@@ -25,8 +25,10 @@ class AdapterRegistry:
 def default_registry() -> AdapterRegistry:
     from .demo.adapter import DemoAdapter
     from .renpy import RenPyAdapter
+    from .text_spans import TextSpanAdapter
 
     registry = AdapterRegistry()
     registry.register("demo", DemoAdapter)
     registry.register("renpy", RenPyAdapter)
+    registry.register("text-spans", TextSpanAdapter)
     return registry

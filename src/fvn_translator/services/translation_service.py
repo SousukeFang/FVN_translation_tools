@@ -66,6 +66,8 @@ class TranslationService:
         previous_summary: str = "",
         progress: ProgressCallback | None = None,
         unit_ids: set[str] | None = None,
+        source_language: str = "en",
+        target_language: str = "zh-CN",
     ) -> str:
         self.stop_requested = False
         run_id = uuid4().hex
@@ -94,6 +96,8 @@ class TranslationService:
                 characters=characters or [],
                 glossary=glossary or [],
                 previous_summary=previous_summary,
+                source_language=source_language,
+                target_language=target_language,
             )
             atomic_write_json(
                 run_root / "requests" / f"{batch_id}.json",

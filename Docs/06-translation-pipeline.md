@@ -1,5 +1,7 @@
 # 翻译流水线
 
+以下是 API 流程。无需翻译 API 的 Agent 流程见 [Agent 翻译模式](12-agent-translation.md)，入口为 [FVN 翻译 skill](../skills/fvn-translate/SKILL.md)。两条路径均采用项目的 source_language 和 target_language。
+
 1. Adapter 发现文件、抽取玩家可见文本并保存 FTIF。
 2. MetadataService 分块提取人物与术语候选，保留 evidence，用户确认后递增版本。
 3. TranslationService 依据预算分批，构造 system prompt、项目要求、相关人物/术语、当前单元、少量相邻上下文和 `<Previous Summary>`。

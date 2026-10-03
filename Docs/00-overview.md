@@ -10,6 +10,7 @@ FVN Translator 把游戏格式处理与 LLM 翻译解耦：Adapter 抽取玩家�
 - 翻译、编辑、公共校验、备份、Apply、Rollback 服务；
 - Textual TUI、DemoAdapter、契约测试和离线端到端测试。
 - Ren’Py 8.x 语法 Adapter、Profile 扩展层及 Remember the Flowers - Part II 0.02 Profile。
+- 无需翻译 API 的 Agent 文件交换流程、任意语言参数、精确文本区间 Adapter 和补丁打包。
 
 阅读顺序：先看[架构](01-architecture.md)和[FTIF v1](02-ftif-v1.md)，开发格式适配器看[Adapter 契约](04-adapter-contract.md)与[模板](adapters/template.md)，Ren’Py 见[专有规范](adapters/renpy.md)，运行与故障恢复看[翻译流水线](06-translation-pipeline.md)和[备份/续传/回退](07-backup-resume-rollback.md)。
 
@@ -19,3 +20,6 @@ uv run fvn-translator
 ```
 
 没有 uv 时可用 `python -m pip install -e .` 安装，再执行 `fvn-translator`。仓库根文件的保留理由见[仓库目录与追踪规则](11-repository-layout.md)。
+
+Agent 模式入口见 [FVN 翻译 skill](../skills/fvn-translate/SKILL.md) 和
+[Agent 翻译模式](12-agent-translation.md)。继续真实 Part II 汉化见 [交接文档](HANDOFF.md)。

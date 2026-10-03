@@ -22,7 +22,13 @@ class TranslationPipelineService:
         self.repository = repository
         self.summaries = JSONLStore(summaries_path, SceneSummary)
 
-    async def run(self, *, progress: ProgressCallback | None = None) -> list[SceneSummary]:
+    async def run(
+        self,
+        *,
+        progress: ProgressCallback | None = None,
+        source_language: str = "en",
+        target_language: str = "zh-CN",
+    ) -> list[SceneSummary]:
         units = self.repository.load()
         scene_order: list[str] = []
         by_scene: dict[str, list[str]] = {}
@@ -43,6 +49,8 @@ class TranslationPipelineService:
                 previous_summary=previous,
                 progress=progress,
                 unit_ids=set(by_scene[scene_id]),
+                source_language=source_language,
+                target_language=target_language,
             )
             if self.translation.stop_requested:
                 break

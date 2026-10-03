@@ -21,6 +21,15 @@
 - 维护命令放在 `scripts/`；
 - 实现代码放在 `src/fvn_translator/`；
 - 测试、示例和计划分别放在 `tests/`、`examples/`、`plan/`；
+- Agent skill 放在 `skills/<skill-name>/`，核心流程、reference 与自身脚本在其目录内；
+- 真实游戏、安装包、翻译工作区、响应和临时文件放忽略的 `work/`；
+- 翻译补丁与说明等本地交付物放忽略的 `output/`；
 - 清理或废弃内容移动到不追踪的 `trash/`。
 
 依赖声明只维护 `pyproject.toml`，环境解析结果维护在 `uv.lock`。根目录 `requirements.txt` 被忽略，避免产生两套可能漂移的依赖来源。
+
+Part II 配置示例位于 `examples/remember_the_flowers/project.example.toml`。旧根目录
+`Remember_The_Flower/` 和重复的 `demo_workspace/`、`demo_workspace_source/` 已移到
+忽略的 `trash/layout-before-agent/`；可追踪的 Demo 示例仍在 `examples/`。
+
+仓库只提交工具、skill、参考规则、合成测试、示例配置和技术文档。工作产物不因生成在本机而自动成为测试 fixture。
