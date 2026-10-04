@@ -30,10 +30,12 @@ uv run fvn-translator agent prepare --source work/echo-project/khemia/source/Khe
 
 音乐室曲名 `name=_(...)` 保留正式曲名和作者，`description=_("Main menu theme")` 等普通介绍及操作说明翻译。不能将所有音乐室 `_()` 字符串全体保留或全体翻译。Gallery 页面/按钮和解释文本列入覆盖。
 
-`images/assets/credits01.jpg` 等是已实际查看的制作名单图像，作者/工作室/URL 原样保留；其图片内说明性英文未被脚本提取。交付明确这部分范围，不能把图像文字算作已译单元。产品 logo 保留。
+`images/assets/credits01.jpg`、`credits02.jpg` 已实际查看：作者/工作室/URL 和产品 logo 保留；本轮另用补充 FTIF 登记 21 条职责、致谢及版权说明，以 `creditsbase.jpg` 原背景和原标志裁片构建原生 Composite/Text，中文三列制作名单通过真实引擎截图检查。该 21 条独立计数，不能混入脚本覆盖率。
 
 `gui.rpy` 使用 `RobotoSlab-Medium.ttf` / `RobotoSlab-ExtraBold.ttf`；screen 多处还直接使用 Medium，音乐室使用 `gui.name_text_font`。需要同时覆盖 gui 与显式样式，并验证 regular/bold/italic 路径替换，保留箭头等 UI 字形。实际字体与许可证放工作目录及补丁附件，不提交真实字体到 Git。
 
 ## 验收和交付
 
 以 Ren’Py 8.3.4 验证脚本、所有五段剧情、名称、centertext、Gallery、音乐室、历史/存读档/设置及常用确认提示。长段内心独白注意文本框容量和断行。按共用流程提供 Windows 0.4 专用补丁及实际安装后完整 ZIP，并在说明记录运行平台限制。
+
+本轮最终 3,517 脚本文本单元完成，3,350 个 AST Say 的实际 Text 渲染无错误/溢出；开场实际推进 110 段对白。lint 与原版基线对比仅增加 7 条百分号接中文标点的旧格式提示，实际显示正常，记录为审查后的误报；不声称 lint 无提示或已完整通关。正式交付与待办见 [交接记录](../../../Docs/ECHO_PROJECT_HANDOFF.md)。

@@ -6,6 +6,8 @@ Profile ID：`echo-route-65`。读取本文件后加载[共用 Echo Project 流�
 
 实际源文检查发现涉及未成年人物的露骨性内容。此类段落不得翻译、复述或随完整游戏包再分发；reference 只记录处理边界，不摘录原文。Root 已向用户说明可继续的非露骨摘要/技术处理范围，产品译文、补丁和完整包须等待本次范围确定后按实际允许范围记录，不能默认沿用另两作的完整汉化交付承诺。
 
+本轮 5,444 单元中已正式导入并审校安全部分 5,269 单元，175 单元保持 pending；没有将待定内容标成 SKIPPED 或计为完成。使用 `agent export --unit-ids-file` 导出正式安全批次，范围外正文和相邻上下文不进入新批次，原始 FTIF 状态及修订规则保留。当前没有 Route 65 下载包，续做状态见 [交接记录](../../../Docs/ECHO_PROJECT_HANDOFF.md)。
+
 ## 本次确认的 Windows 输入
 
 - 下载包：`EchoRoute65-1.01-pc.zip`，218,925,746 bytes。
@@ -33,6 +35,10 @@ uv run fvn-translator agent prepare --source work/echo-project/echo-route-65/sou
 `game/images/cellf*.png` / `cellff*.png` 包含实际手机短信；已实际查看 `cellf1r.png`，消息正文直接烘焙在手机图像上。它们是剧情覆盖的一部分，须登记短信文字和调用场景，再制作可还原、经渲染检查的汉化覆盖。不能仅翻译四个 `.rpy` 后宣称剧情全部中文。
 
 `game/ui/mm/` 主菜单和 `game/ui/bt_*` 按钮也使用图像文字，例如 `bt_config_idle.png` 显示 Config。姓名图像保留角色英文名；常用按钮应添加中文可见/无障碍说明或经过验证的汉化 UI。资源路径与 action、声音、focus_mask、hover 状态保持一致。
+
+本轮安全覆盖验证为 102 张图像、276 个原生 Text 框，另有 4 张短信图像等待范围决定。12 处 `show image "文件名"` 属于直接图像表达式，仅注册同名 `renpy.image` 不会覆盖；通过精确匹配原 Show.imspec 的窄范围替换，保持 tag、transform、hide 语义，匹配 7.2.2 验证全部对应关系并实际执行原节点检查。不得包装 Image 工厂或全局替换未知表达式。原头像/姓名裁片须避开相邻英文标签；字幕须遮住完整原文字区域，中文论坛说明按可读布局重建。
+
+四份剧情中重复的一行含误用 `\,`、`\W`、`\G`。本轮只在独立 source 副本修正这四行后重新抽取，5,444 个 unit ID 不变；位置与原/准备文件哈希登记 `source-normalization.json`，原 ZIP 保持不变。不能放宽真实受保护转义校验或为了过校验在中文前插入拉丁字母。
 
 字体资产有 `Daubmark.ttf`、`ui/arcon.otf`、`ui/belligerent.ttf`；默认 `style.default.font` 却写作 `ui/Arcon.otf`。Windows 大小写不敏感，Linux 验证需处理路径兼容并记录。正文有 `{font=ui/belligerent.ttf}`，仅修改默认字体不足以覆盖中文；保持标签并验证所有显式字体的 CJK 替换。旧 UI 无 `gui.rpy`，不能套用新模板。
 

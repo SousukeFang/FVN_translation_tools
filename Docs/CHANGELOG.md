@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-04 Echo Project 本轮交付
+
+- 完成 Khemia 3,517、Interea 2,296 脚本文本单元及中文字体；另补充共用 66 提示和 Khemia 21 制作名单说明，实际安装补丁并验证 Windows 完整 ZIP。
+- 匹配 SDK 的正文渲染、开场、界面、中文姓名与图像文字检查通过；Google Drive 超过 100 MiB 的完整 ZIP 使用校验过的字节分卷，下载与安装 Page 已发布。
+- Route 65 正式保存 5,269 安全译文，175 单元及 4 图像的范围尚待用户选择；不交付受限原样内容，不冒称任务全量完成，合并/删分支条件仍未触发。
+- 更新专属/common reference 的实际行高、图像表达式覆盖、字体符号、源规范化及分卷处理；续做与下载记录见 `Docs/ECHO_PROJECT_HANDOFF.md`。
+
 ## 2026-10-04 Agent 选定范围导出
 
 - Agent 导出增加可选 `unit_ids` 白名单与 CLI `--unit-ids-file`，正文及相邻上下文都限于选定范围；未知 ID 拒绝导出，范围外状态与 revision 不变。

@@ -43,6 +43,10 @@ uv run fvn-translator agent export --workspace work/echo-project/SLUG/translatio
 
 设置 `gui.text_font` 只覆盖采用 gui 的样式。旧版 Route 65 使用 `style.default.font`；Khemia screen 内有显式 `font "RobotoSlab-Medium.ttf"`；Route 65 正文含 `{font=ui/belligerent.ttf}`。保持受保护标签原样，通过对应引擎支持的 `config.font_replacement_map`/字体设置处理指定路径与 bold/italic 组合。优先补充运行脚本，避免无记录改源码字体参数。逐个版本验证 API 和初始化时机。
 
+本轮采用完整 Noto Sans CJK SC Regular 2.004（16,437,364 bytes，SHA-256 `2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b`），不按剧情裁剪，以覆盖 Interea 的常见中文自定义姓名。CJK 字体不含原版快进三角 `U+25B8`；另附 Noto Sans Symbols2 及 OFL，只替换 `style.skip_triangle`。按实际所用字体检查完整目标字符，而非只检查正文汉字。
+
+真实 Ren’Py 行高不能用字号估算。7.2.2 中本轮字体 22px 的行高约 35px、15px 约 25px；原生 Text 渲染检查曾发现仅靠估算漏出的溢出。按 ascent、descent、line_spacing 及实际引擎渲染尺寸布局，检查宽度、高度和各覆盖层重叠。Route 65 原固定文本框需自动扩展并与底部快捷菜单错开；Khemia 制作名单用三列中文原生界面避免多行署名碰撞。
+
 验证 staging round-trip、保护内容、未翻译结构和字体覆盖；使用匹配版本的 Linux SDK 可验证 Windows 包的游戏脚本，但不能据此声称已实测 Windows EXE。记录实际 lint、开场、各分支、菜单、长句和特殊字体渲染结果。原版 lint 问题须先建立基线，不能将原有警告全部归因于补丁。
 
 ## 补丁与完整 Windows 包
@@ -50,3 +54,5 @@ uv run fvn-translator agent export --workspace work/echo-project/SLUG/translatio
 `agent package` 只打包改变的 `game/...rpy` 与显式字体/运行附件，按游戏 reference 加入安装说明。说明包含官方包名与 SHA-256、覆盖范围、补丁文件清单、备份和实际验证。补丁合并到 EXE 所在目录；补丁涉及的同名旧 `.rpyc` 移到备份，必要时移走 `game/cache/`，保留 `game/saves/` 和系统存档。回退恢复原文件并移走新增附件。
 
 用户要求且本作允许范围包含完整汉化包时，在独立原版副本实际应用最终 ZIP，核对清单中的所有目标 SHA-256，处理对应旧编译脚本后再压成 Windows ZIP。Route 65 的本次范围限制见其专属 reference。可交付的补丁与完整包提供清晰下载项；完整包按制作组/系列/语言/版本整理到 Google Drive 子文件夹，不能直接散放根目录。Page 使用真实上传链接，记录大小、校验值、安装与恢复步骤；未完成上传或运行检查不得写成已完成。
+
+本轮 Google Drive 连接器实测对超过 100 MiB 的单文件返回 413。完整 ZIP 使用 90 MiB 字节分卷，验证按序合并 SHA-256 与原 ZIP 一致；各游戏独立子文件夹上传所有分卷、校验清单及 Windows 恢复工具。Page 必须说明分卷数量和恢复方法，不能将分卷文件夹说成单个 ZIP 直链。上传回读可核对文件名、字节数和父文件夹；工具未返回服务端校验和时，不声称核对了服务端 SHA/MD5。

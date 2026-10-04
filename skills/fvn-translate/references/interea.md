@@ -32,3 +32,5 @@ uv run fvn-translator agent prepare --source work/echo-project/interea/source/In
 `gui.rpy` 的文本、姓名与界面默认字体均为引擎提供的 `DejaVuSans.ttf`，游戏目录没有额外 TTF/OTF。添加可分发的中文字体，覆盖 gui 与 screen 中显式 DejaVuSans，保留 UI 箭头等字形。检查命名输入、`[mc]` 混排、存档页码、历史和确认框。
 
 使用匹配 Ren’Py 7.4.4 的 Python 2 运行环境；复用 8.x 运行脚本前必须核对 API。实际检查所有四个当前章节，以及恢复后的旧脚本范围。补丁说明明确 `a2s2.rpyc` 的处理结论与哈希、其不属于当前启动流程的事实；保留原控制流，不将它标成新增主线章节。Windows 0.4 补丁和实际安装后完整 ZIP 按共用流程上传与发布 Page。
+
+本轮最终 2,296 脚本文本单元完成，2,161 个 AST Say（含恢复的 415 个）实际 Text 渲染无错误/溢出；开场推进 80 段对白，中文姓名“青岚”实际输入、返回及插值正确。旧 `a2s2:102` 的长字面说话人也单独运行核对，中文完整显示，保留原异常和控制流。正式交付与待办见 [交接记录](../../../Docs/ECHO_PROJECT_HANDOFF.md)。
