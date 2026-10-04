@@ -64,12 +64,19 @@ class AgentTranslationService:
         )
 
     def export_batches(
-        self, output_root: Path, *, max_chars: int = 12000, context_units: int = 3
+        self,
+        output_root: Path,
+        *,
+        max_chars: int = 12000,
+        context_units: int = 3,
+        unit_ids: set[str] | None = None,
     ) -> list[Path]:
         """Export pending/failed units in sequence; the budget includes the task JSON.
 
         Adjacent scenes can share a task. An individual unit is never split, so one
         unusually long unit or its metadata can exceed the character budget.
+        An explicit ID selection limits both requested units and adjacent context;
+        units outside it retain their existing translation status and revisions.
         """
         if max_chars <= 0 or context_units < 0:
             raise ValueError("max_chars must be positive and context_units non-negative")
@@ -78,10 +85,15 @@ class AgentTranslationService:
             manifest = self._manifest()
             units = self.repository.load()
             positions = {unit.unit_id: index for index, unit in enumerate(units)}
+            if unit_ids is not None:
+                unknown_ids = unit_ids.difference(positions)
+                if unknown_ids:
+                    raise DataIntegrityError(f"Unknown unit IDs: {', '.join(sorted(unknown_ids))}")
             pending = [
                 unit
                 for unit in units
                 if unit.translation.status in {TranslationStatus.PENDING, TranslationStatus.FAILED}
+                and (unit_ids is None or unit.unit_id in unit_ids)
             ]
             characters = MetadataRepository(
                 self.workspace.intermediate / "characters.json", Character
@@ -119,10 +131,12 @@ class AgentTranslationService:
                     "context_before": [
                         _visible_unit(unit, context=True)
                         for unit in units[max(0, start - context_units) : start]
+                        if unit_ids is None or unit.unit_id in unit_ids
                     ],
                     "context_after": [
                         _visible_unit(unit, context=True)
                         for unit in units[end : end + context_units]
+                        if unit_ids is None or unit.unit_id in unit_ids
                     ],
                     "units": [_visible_unit(unit) for unit in batch],
                 }

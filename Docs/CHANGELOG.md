@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-04 Agent 选定范围导出
+
+- Agent 导出增加可选 `unit_ids` 白名单与 CLI `--unit-ids-file`，正文及相邻上下文都限于选定范围；未知 ID 拒绝导出，范围外状态与 revision 不变。
+- 选定批次沿用正式任务登记、指纹核对及 revision 导入；部分范围完成仍保留整体待处理单元，不通过标记 SKIPPED 冒充全量完成。
+- 四项门禁通过，102 项离线测试覆盖稀疏范围、恢复导入、默认兼容、非法选择与非选定单元完整保留。
+
 ## 2026-10-04 字面图像文本保护
 
 - 为明确不做插值的 `text-spans` 文本增加 `placeholder_mode="explicit"`：只校验声明的受保护项，避免将图像内 `[Click thumbnail to enlarge]` 一类文字误认成变量。

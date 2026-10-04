@@ -31,6 +31,11 @@ def build_parser() -> argparse.ArgumentParser:
     export.add_argument("--output", type=Path)
     export.add_argument("--max-chars", type=int, default=12000)
     export.add_argument("--context-units", type=int, default=3)
+    export.add_argument(
+        "--unit-ids-file",
+        type=Path,
+        help="JSON array of unique, nonempty unit IDs; limits tasks and adjacent context",
+    )
     importing = actions.add_parser("import", help="Validate and import one Agent response")
     importing.add_argument("--workspace", type=Path, required=True)
     importing.add_argument("--task", type=Path, required=True)
@@ -136,8 +141,21 @@ def run_agent(args: argparse.Namespace) -> dict[str, object]:
     repository = UnitRepository(workspace.intermediate / "units.jsonl")
     if args.action == "export":
         output = args.output or workspace.runs / "agent-tasks" / uuid4().hex[:12]
+        unit_ids = None
+        if args.unit_ids_file is not None:
+            selection = json.loads(args.unit_ids_file.read_text(encoding="utf-8"))
+            if not isinstance(selection, list) or any(
+                not isinstance(unit_id, str) or not unit_id.strip() for unit_id in selection
+            ):
+                raise ValueError("--unit-ids-file expects a JSON array of nonempty string unit IDs")
+            unit_ids = set(selection)
+            if len(unit_ids) != len(selection):
+                raise ValueError("--unit-ids-file unit IDs must be unique")
         tasks = AgentTranslationService(workspace).export_batches(
-            output, max_chars=args.max_chars, context_units=args.context_units
+            output,
+            max_chars=args.max_chars,
+            context_units=args.context_units,
+            unit_ids=unit_ids,
         )
         return {"tasks": [str(path) for path in tasks], "batches": len(tasks)}
     if args.action == "import":

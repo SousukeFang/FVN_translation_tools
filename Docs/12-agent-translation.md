@@ -29,7 +29,7 @@ plan/agent-translation/         # 开发计划，追踪
 | 命令 | 用途 |
 | --- | --- |
 | `prepare` | 创建工作区、自动识别 Adapter 并抽取；明确提供源语言与目标语言 |
-| `export` | 导出 pending/failed 单元、相邻上下文、人物和术语；字符预算包含任务 JSON |
+| `export` | 导出 pending/failed 单元、相邻上下文、人物和术语；可按 ID 筛选；字符预算包含任务 JSON |
 | `import` | 整批核对 ID、任务登记、源指纹、语言和保护内容，归档响应、追加 revision |
 | `status` | 统计语言、单元数量和完成状态 |
 | `validate` | 在 staging 回写并进行公共和格式校验 |
@@ -40,6 +40,18 @@ plan/agent-translation/         # 开发计划，追踪
 姓名与世界观专名默认保留源文，不以全文每个词都中文作为完成标准。用户明确译名优先，普通描述和同形词按语境消歧；处理方式及例外记录在共享 brief。规则变更先按源文实体定位候选并读上下文，再通过完整登记批次重新导入；禁止对中文姓名单字全局替换或只修改交付 ZIP。详见 skill 的「专名与术语的处理规则」。
 
 并行子代理各自写响应文件，导入串行执行。工作区锁与小型提交记录保证批次写入可恢复；JSON/JSONL 使用原子替换。已翻译单元不进入续传批次；重新导出用新的任务目录，避免覆盖正在执行的任务。
+
+需要分阶段处理明确范围时，将单元 ID 保存为 JSON 数组，例如 `["unit-1","unit-3"]`，再运行：
+
+```bash
+uv run fvn-translator agent export --workspace work/game/translation --output work/game/selected-tasks --unit-ids-file work/game/selected-unit-ids.json
+```
+
+ID 必须是非空且不重复的字符串；未知 ID 会被拒绝，空数组表示此次不导出任何单元。
+筛选仅导出指定范围内的 pending/failed 单元，相邻上下文也只包含所选 ID，已有译文仍可作为所选上下文。
+任务按正常流程登记、导入和追加 revision；范围外单元保留原状态、译文和修订记录，不能将其标记为 skipped 来充当完成。
+`AgentTranslationService.export_batches(..., unit_ids={...})` 提供同一能力；不传参数时沿用完整续传导出。
+整体完成率和打包完整性门禁仍以全部权威单元为准，筛选不会改变项目范围。
 
 源码转义由 Adapter 处理。Agent 使用解码后的 source_text 和 target_text；Ren’Py 的转义签名、字体标签与插值在最终 staging 校验中检查。
 
