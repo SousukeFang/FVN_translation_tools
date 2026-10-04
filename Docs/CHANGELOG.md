@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-04 字面图像文本保护
+
+- 为明确不做插值的 `text-spans` 文本增加 `placeholder_mode="explicit"`：只校验声明的受保护项，避免将图像内 `[Click thumbnail to enlarge]` 一类文字误认成变量。
+- 默认继续自动识别标签与插值；离线测试验证字面说明可翻译、声明变量不可丢失，以及 staging 回写保持准确。
+- Ruff、格式、Pyright 与 85 项离线测试通过；实际游戏、译文及运行附件仍放忽略目录。
+
 ## 2026-10-03 Echo Project 三部 FVN 技能接入
 
 - 实际下载并比较 Echo: Route 65 Windows 1.01、Khemia Windows 0.4、Interea Windows 0.4；引擎分别为 Ren’Py 7.2.2、8.3.4、7.4.4，复用文本处理流程并保留版本差异。

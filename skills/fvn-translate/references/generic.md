@@ -30,6 +30,12 @@ uv run fvn-translator agent prepare --source work/game/source --workspace work/g
 
 Adapter 检查范围、重叠、原文、源哈希，按逆序区间替换并验证未修改区间。额外需要原样保留的内容用 span 的 `protected_tokens` 字符串数组声明；map 不接受 `constraints` 字段。
 
+纯图像文字或其他已确认不做变量插值的字面文本，可在该 span 设置
+`"placeholder_mode":"explicit"`，只保护明确列出的 `protected_tokens`。例如图像中的
+`[Click thumbnail to enlarge]` 是可翻译说明，不能误当变量；真实 `[username]` 等变量
+仍须在列表中声明。默认 `auto` 继续推断标签/插值。运行附件显示这类文字时也须
+关闭插值或正确转义，不能把文字误当引擎表达式。
+
 ## 通用补丁要求
 
 - 覆盖已识别剧情，检查分支与选项；指出当前格式未自动识别的范围。

@@ -7,8 +7,16 @@ from .placeholders import extract_placeholders
 
 def validate_unit(unit: TranslationUnit) -> list[Issue]:
     issues: list[Issue] = []
-    source = extract_placeholders(unit.source_text)
-    target = extract_placeholders(unit.target_text)
+    if unit.constraints.get("placeholder_mode") == "explicit":
+        source = [
+            token for token in unit.protected_tokens for _ in range(unit.source_text.count(token))
+        ]
+        target = [
+            token for token in unit.protected_tokens for _ in range(unit.target_text.count(token))
+        ]
+    else:
+        source = extract_placeholders(unit.source_text)
+        target = extract_placeholders(unit.target_text)
     if sorted(source) != sorted(target):
         issues.append(
             _issue(

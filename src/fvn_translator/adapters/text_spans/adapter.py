@@ -34,6 +34,7 @@ class Span(StrictModel):
     speaker: str | None = None
     scene_id: str | None = None
     protected_tokens: list[str] = Field(default_factory=list)
+    placeholder_mode: Literal["auto", "explicit"] = "auto"
 
 
 class MappedFile(StrictModel):
@@ -168,9 +169,17 @@ class TextSpanAdapter:
                         source_fingerprint=bytes_hash(span.source_text.encode("utf-8")),
                         protected_tokens=list(
                             dict.fromkeys(
-                                [*extract_placeholders(span.source_text), *span.protected_tokens]
+                                [
+                                    *(
+                                        extract_placeholders(span.source_text)
+                                        if span.placeholder_mode == "auto"
+                                        else []
+                                    ),
+                                    *span.protected_tokens,
+                                ]
                             )
                         ),
+                        constraints={"placeholder_mode": span.placeholder_mode},
                         origin={
                             "path": relative,
                             "line": text.count("\n", 0, span.start) + 1,
