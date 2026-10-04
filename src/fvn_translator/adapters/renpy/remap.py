@@ -70,6 +70,8 @@ def _candidates(new: TranslationUnit, old_units: list[TranslationUnit]) -> list[
         old
         for old in old_units
         if old.adapter_data.get("source_statement_fingerprint") == statement
+        and old.adapter_data.get("text_role") == new.adapter_data.get("text_role")
+        and old.adapter_data.get("node_kind") == new.adapter_data.get("node_kind")
     ]
     if matched:
         return matched

@@ -101,6 +101,13 @@ class RenPyExtractor:
                 )
                 if node.extends_index is not None and node.extends_index < len(local_ids):
                     unit.adapter_data["extends_unit_id"] = local_ids[node.extends_index]
+                if (
+                    node.kind == "say_explicit"
+                    and file_units
+                    and file_units[-1].adapter_data.get("node_kind") == "explicit_display_name"
+                    and file_units[-1].adapter_data.get("statement_start") == node.statement_start
+                ):
+                    unit.adapter_data["explicit_display_name_unit_id"] = file_units[-1].unit_id
                 if self.profile:
                     unit = self.profile.enrich_unit(
                         unit,

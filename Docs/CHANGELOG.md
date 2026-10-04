@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-03 Echo Project 三部 FVN 技能接入
+
+- 实际下载并比较 Echo: Route 65 Windows 1.01、Khemia Windows 0.4、Interea Windows 0.4；引擎分别为 Ren’Py 7.2.2、8.3.4、7.4.4，复用文本处理流程并保留版本差异。
+- 新增共用 Echo Project reference 和三份专属 reference，登记原包 SHA-256、剧情/角色/UI、字体路径、Route 65 手机短信图像和 Interea 仅编译脚本的覆盖检查要求。
+- 扩充 skill 参考分发与分阶段计划，继续使用忽略的 `work/` 与 `output/` 保存实际游戏、翻译及成品。
+- 注册共用实现的三个游戏 Profile，识别旧式及跨行 Character 定义、命名输入和通知，排除实现模块与样式伪对白；增加显式说话人名称的抽取和回写关联校验。
+- 本项为翻译前的接入记录；正式译文、运行检查、上传与 Page 发布按实际完成后另行记录。
+
 ## 2026-10-03 专名保留规范与 Part II 修订
 
 - 核心翻译 skill 加入专名默认保留、用户规则优先、语境消歧及有依据的译名例外；自然中文不要求姓名和世界观名称一律中文化。

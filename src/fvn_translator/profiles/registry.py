@@ -23,8 +23,12 @@ class ProfileRegistry:
 
 
 def default_profile_registry() -> ProfileRegistry:
+    from .echo_project import EchoRoute65Profile, IntereaProfile, KhemiaProfile
     from .remember_the_flowers import RememberTheFlowersProfile
 
     registry = ProfileRegistry()
     registry.register("remember-the-flowers-ii", RememberTheFlowersProfile)
+    registry.register("echo-route-65", EchoRoute65Profile)
+    registry.register("khemia", KhemiaProfile)
+    registry.register("interea", IntereaProfile)
     return registry

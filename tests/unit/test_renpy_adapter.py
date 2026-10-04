@@ -49,11 +49,12 @@ def test_generic_extraction_covers_supported_syntax() -> None:
     files = adapter.discover_files(source, AdapterConfig())
     result = adapter.extract(source, files, AdapterConfig())
     assert not result.issues
-    assert len(result.units) == 15
-    assert [unit.type for unit in result.units[:8]] == [
+    assert len(result.units) == 16
+    assert [unit.type for unit in result.units[:9]] == [
         UnitType.NARRATION,
         UnitType.DIALOGUE,
         UnitType.DIALOGUE,
+        UnitType.CHARACTER_NAME,
         UnitType.DIALOGUE,
         UnitType.DIALOGUE_EXTENSION,
         UnitType.SCREEN_TEXT,
@@ -62,7 +63,7 @@ def test_generic_extraction_covers_supported_syntax() -> None:
     ]
     assert result.units[2].speaker == "eileen"
     assert result.units[2].adapter_data["speaker_attributes"] == ["angry"]
-    assert result.units[4].adapter_data["extends_unit_id"] == result.units[3].unit_id
+    assert result.units[5].adapter_data["extends_unit_id"] == result.units[4].unit_id
     assert "{i}" in result.units[0].protected_tokens
     assert "[player_name]" in result.units[0].protected_tokens
 

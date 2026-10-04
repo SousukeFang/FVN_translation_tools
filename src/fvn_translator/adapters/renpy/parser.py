@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from bisect import bisect_left
 from typing import TypedDict
 
 from fvn_translator.core.hashing import bytes_hash
@@ -46,7 +47,9 @@ NON_TEXT_STATEMENTS = frozenset(
         "right_bar",
         "selected_color",
         "selected_hover",
+        "selected_hover_color",
         "selected_idle",
+        "selected_idle_color",
         "size_group",
         "style_prefix",
         "thumb",
@@ -128,6 +131,7 @@ class RenPyParser:
         tokens_by_line: dict[int, list[StringToken]] = {}
         for token in lexed.strings:
             tokens_by_line.setdefault(token.start_line, []).append(token)
+        token_starts = [token.start for token in lexed.strings]
         comments = {token.line: token.text.strip() for token in lexed.comments}
         delimiter_depths = _delimiter_depths(text, lexed.strings)
         label = "<file>"
@@ -138,11 +142,14 @@ class RenPyParser:
         atl_indent: int | None = None
         visible_index = 0
         previous_dialogue_index: int | None = None
+        continuation_start = 0
         for line_number, raw_line in enumerate(lines, 1):
             line = raw_line.rstrip("\r\n")
             stripped = line.lstrip(" \t")
             indent = len(line) - len(stripped)
             in_continuation = delimiter_depths[line_number - 1] > 0
+            if not in_continuation:
+                continuation_start = line_starts[line_number - 1]
             if stripped and not stripped.startswith("#"):
                 if screen_indent is not None and indent <= screen_indent and not SCREEN.match(line):
                     screen_indent = None
@@ -179,8 +186,13 @@ class RenPyParser:
             tokens = sorted(tokens_by_line.get(line_number, []), key=lambda item: item.start)
             if not tokens:
                 continue
-            statement_start = line_starts[line_number - 1]
+            statement_start = continuation_start
             statement_end = _statement_end(text, line_starts, tokens)
+            statement_strings = lexed.strings[
+                bisect_left(token_starts, statement_start) : bisect_left(
+                    token_starts, statement_end
+                )
+            ]
             scene_id = f"{relative_path}:{label}:{scene_index}"
             classified = self._classify(
                 text,
@@ -198,6 +210,7 @@ class RenPyParser:
                 previous_dialogue_index,
                 atl_indent is not None and indent > atl_indent,
                 in_continuation,
+                statement_strings,
             )
             if classified:
                 for node in classified:
@@ -261,6 +274,7 @@ class RenPyParser:
         previous_dialogue_index: int | None,
         in_atl: bool,
         in_continuation: bool,
+        statement_strings: list[StringToken],
     ) -> list[TextNode]:
         base: NodeBase = {
             "statement_start": statement_start,
@@ -272,8 +286,8 @@ class RenPyParser:
             "statement_index": statement_index,
         }
         stripped = line.lstrip(" \t")
-        line_absolute = statement_start
         first = tokens[0]
+        line_absolute = first.start - first.start_column
         prefix = text[line_absolute : first.start].strip()
         if is_show_text(stripped) and first.start >= line_absolute + line.find("text"):
             return [TextNode(kind="show_text", unit_type=UnitType.SCREEN_TEXT, token=first, **base)]
@@ -292,7 +306,7 @@ class RenPyParser:
                     ]
         if in_menu and prefix == "" and is_menu_choice_suffix(text[first.end : statement_end]):
             return [TextNode(kind="menu", unit_type=UnitType.MENU_CHOICE, token=first, **base)]
-        function_nodes = self._function_nodes(text, tokens, base)
+        function_nodes = self._function_nodes(text, tokens, base, statement_strings)
         if function_nodes:
             return function_nodes
         if in_python or in_screen or in_atl or in_continuation:
@@ -302,13 +316,20 @@ class RenPyParser:
             if not between.strip():
                 return [
                     TextNode(
+                        kind="explicit_display_name",
+                        unit_type=UnitType.CHARACTER_NAME,
+                        token=first,
+                        text_role="speaker-name",
+                        **base,
+                    ),
+                    TextNode(
                         kind="say_explicit",
                         unit_type=UnitType.DIALOGUE,
                         token=tokens[1],
                         speaker=first.value,
                         explicit_display_name=first.value,
                         **base,
-                    )
+                    ),
                 ]
         if prefix == "":
             return [TextNode(kind="say", unit_type=UnitType.NARRATION, token=first, **base)]
@@ -341,7 +362,11 @@ class RenPyParser:
         return []
 
     def _function_nodes(
-        self, text: str, tokens: list[StringToken], base: NodeBase
+        self,
+        text: str,
+        tokens: list[StringToken],
+        base: NodeBase,
+        statement_strings: list[StringToken],
     ) -> list[TextNode]:
         sinks = [
             *(
@@ -359,7 +384,7 @@ class RenPyParser:
                     token=token,
                     statement_start=base["statement_start"],
                     statement_end=base["statement_end"],
-                    strings=tokens,
+                    strings=statement_strings,
                     keyword=sink.keyword,
                 )
                 if argument == sink.argument:
@@ -371,7 +396,9 @@ class RenPyParser:
                             text_role=f"argument-{sink.argument}",
                             context={
                                 "function": sink.function,
-                                "statement_prefix": text[base["statement_start"] : token.start],
+                                "statement_prefix": text[
+                                    token.start - token.start_column : token.start
+                                ],
                             },
                             **base,
                         )
@@ -423,7 +450,7 @@ class RenPyParser:
         prefix = line[: tokens[0].start_column].strip()
         if not prefix or any(symbol in prefix for symbol in ("=", "(", ")", ".", "[", "]")):
             return False
-        if prefix.split()[0] in NON_TEXT_STATEMENTS:
+        if prefix.split()[0].lower() in NON_TEXT_STATEMENTS | DISALLOWED_SAY:
             return False
         return bool(re.fullmatch(r"[A-Za-z_]\w*(?:\s+\S+)*", prefix))
 

@@ -60,6 +60,7 @@ class RenPyValidator:
             ).extract(staging_root, [source_file])
             issues.extend(actual.issues)
             actual_by_id = {unit.unit_id: unit for unit in actual.units}
+            expected_by_id = {unit.unit_id: unit for unit in expected_units}
             for expected in expected_units:
                 found = actual_by_id.get(expected.unit_id)
                 if found is None:
@@ -84,7 +85,12 @@ class RenPyValidator:
                             expected.unit_id,
                         )
                     )
-                if found.speaker != expected.speaker or found.adapter_data.get(
+                desired_speaker = expected.speaker
+                name_id = expected.adapter_data.get("explicit_display_name_unit_id")
+                if name_id is not None and str(name_id) in expected_by_id:
+                    name_unit = expected_by_id[str(name_id)]
+                    desired_speaker = name_unit.target_text or name_unit.source_text
+                if found.speaker != desired_speaker or found.adapter_data.get(
                     "speaker_attributes"
                 ) != expected.adapter_data.get("speaker_attributes"):
                     issues.append(

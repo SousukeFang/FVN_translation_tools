@@ -11,7 +11,15 @@ description: Translate a furry visual novel directly with an Agent into any requ
 
 确认游戏版本、平台、原文语言和用户目标语言。语言不局限于英语和中文。下载、解包、真实游戏文本和译文放仓库忽略的 `work/<game>/`，交付文件放忽略的 `output/<game>/<language>/`。
 
-《Remember the Flowers - Part II》读取 [专属 reference](references/remember-the-flowers-ii.md)。其他 FVN 读取 [通用 reference](references/generic.md)。只有命中的 reference 需要加载；新游戏的处理要点写入新的 reference，核心流程继续使用本文件。
+按目标游戏读取匹配 reference：
+
+- 《Remember the Flowers - Part II》：[专属 reference](references/remember-the-flowers-ii.md)。
+- 《Echo: Route 65》：[专属 reference](references/echo-route-65.md)。
+- 《Khemia》：[专属 reference](references/khemia.md)。
+- 《Interea》：[专属 reference](references/interea.md)。
+- 其他 FVN：[通用 reference](references/generic.md)。
+
+Echo Project 的三份专属 reference 共用 [引擎、字体、图像文字与交付流程](references/echo-project-renpy.md)，但分别采用真实包对应的 Profile 和 Ren’Py 版本。只有命中的 reference 及其共用规则需要加载；新游戏的处理要点写入新的 reference，核心流程继续使用本文件。
 
 检查真实输入的引擎、剧情位置、角色定义、UI、字体与既有译文。参考中的旧版本统计只作线索，本次提取报告才是覆盖范围依据。
 

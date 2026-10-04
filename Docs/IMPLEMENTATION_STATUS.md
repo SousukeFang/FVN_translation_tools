@@ -2,6 +2,18 @@
 
 更新时间：2026-10-03
 
+## Echo Project 接入
+
+三个官方 Windows 包已下载并核对，新增 `echo-route-65`、`khemia`、`interea`
+Profile 与共用/专属 skill reference。它们分别使用 Ren’Py 7.2.2、8.3.4、7.4.4；
+同组作品共用文本流程，但分别验证引擎、字体与 UI。角色定义、可见输入和显式
+说话人显示名已纳入抽取，样式及实现模块伪对白被排除。
+
+正式提取为 Route 65 5,444、Khemia 3,517、Interea 2,296 个非空单元；Interea
+计入经匹配引擎恢复并核验的旧编译场景。数量仅为提取范围，不代表已完成翻译。
+本轮 Linux / Python 3.12 / uv 的四项质量门禁、83 项离线测试及 Schema 示例通过。
+Route 65 的内容处理范围与交付限制见专属 reference；正式翻译与成品另行记录。
+
 ## Agent 翻译模式
 
 已完成非 API 的 Agent 批次交换、任意语言参数、精确文本区间 Adapter、补丁打包和
