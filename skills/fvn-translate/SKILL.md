@@ -5,7 +5,9 @@ description: Translate a furry visual novel directly with an Agent into any requ
 
 # FVN Agent 翻译
 
-完成目标是可安装的翻译补丁和说明文件。Agent 处理语义、人物口吻、术语与审校；程序处理定位、分批、导入、校验、回写和打包。使用本 skill 所在的完整仓库，执行 `uv sync --extra dev`；没有 uv 时执行 `python -m pip install -e .`。
+未特别指定时，只向用户交付可安装的翻译补丁和说明文件；此默认规则适用于文件、下载链接和 Page 等所有交付方式。必要字体、运行脚本、许可证和校验清单随补丁打包。完整游戏、skill/工具扩展包、源码、译文工作区及内部验收文件仅在用户明确要求时作为额外交付项。
+
+Agent 处理语义、人物口吻、术语与审校；程序处理定位、分批、导入、校验、回写和打包。使用本 skill 所在的完整仓库，执行 `uv sync --extra dev`；没有 uv 时执行 `python -m pip install -e .`。
 
 ## 1. 识别输入与参考规则
 
@@ -95,6 +97,6 @@ uv run fvn-translator agent validate --workspace work/game/translation
 uv run fvn-translator agent package --workspace work/game/translation --output output/game/zh-CN --install-notes work/game/install-notes.md
 ```
 
-附件用 `--extra 游戏内相对路径=本地文件` 或 `--extra-files 附件映射.json`。输出 ZIP、`README.md` 和 `manifest.json`，说明适用版本、安装路径、备份/恢复、覆盖范围与验证情况。
+附件用 `--extra 游戏内相对路径=本地文件` 或 `--extra-files 附件映射.json`。程序输出 ZIP、`README.md` 和 `manifest.json`；默认对外交付只有补丁 ZIP 和说明文件，manifest 随补丁保存，不额外提供独立下载项。说明包含适用版本、安装路径、备份/恢复、覆盖范围与验证情况。内部验收照常执行并记录在工作区。
 
 确认 ZIP 清单、安装说明和可下载文件后交付。用户要求 Page 时，默认只发布汉化补丁下载与面向玩家的说明：适用版本、安装/回退、覆盖范围、校验值、已知限制和许可。skill 源码、工具扩展包、内部验收文件保存在仓库或工作区，不加入补丁 Page。若上传需分卷，记录单卷/完整 ZIP 的大小、SHA-256、顺序和恢复方法，实测恢复一致后再交付；按连接器实际返回记录上传验证，不推定服务端哈希已核对。真实游戏、临时文件、翻译响应和成品不提交到 Git；工具或 reference 开发变更按用户要求提交并推送，通过仓库门禁后核对远端提交。

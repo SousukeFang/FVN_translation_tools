@@ -53,6 +53,7 @@ Agent 直接翻译游戏时加载 [FVN 翻译 skill](skills/fvn-translate/SKILL.
    - 当前 FVN 目标为 A Role to Play；匹配 Profile 和独立 reference 已接入。
 
 9. Agent 翻译与交付
+   - 未特别指定时，只交付可安装的翻译补丁及说明文件，适用于文件、链接和 Page。必要附件随补丁打包；完整游戏、skill/工具包、源码、工作区和内部验收文件仅在用户明确要求时额外交付。
    - `skills/fvn-translate/SKILL.md` 保留核心流程；每个游戏的翻译与打包要求放独立 reference。
    - Agent 只输出任务对应译文，程序导入 FTIF、追加 revision、校验和打包；不通过 Provider/API 翻译。
    - 下载、原游戏、译文、运行记录放忽略的 `work/`；补丁和说明放忽略的 `output/`。这些产物不提交到仓库。
