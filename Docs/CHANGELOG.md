@@ -8,6 +8,7 @@
 - 补充安全 overlay 与源码补丁的打包边界、连接器 100 MiB 实测限制和 90 MiB 分卷恢复规则；明确接受范围完成率、全量 FTIF pending、Linux SDK/Windows 本机测试及服务端哈希的验收界限。Route 65 最终 14,630,214-byte 补丁已独立安装/上传，12 附件与 QA 冻结清单一致、1,540 原文件不变。
 - Route 65 实际 5,269 目标和 175 保留节点核对、5,231 Text 渲染、长句/centered、原生开场存读档、102 图像/276 Text、clean lint 与字形验收完成；99 条 italic 的 1–4px 边缘外伸在 30px padding 内完整可见。仅隔离执行一个 Show 改写和展示菜单标签，未完成 Windows 本机测试/全路线通关。Page 最终回读 38 blocks，核对三补丁、新 hash/大小、存读档和 175/4 范围。
 - 更新专属/common reference 的实际行高、图像表达式覆盖、字体符号、源规范化及分卷处理；续做与下载记录见 `Docs/ECHO_PROJECT_HANDOFF.md`。
+- 全部 work 提交已快进合并并推送 main；两支在 7ef0d70 核对一致且 work 独有提交数为 0 后，已删除本地及远程 work。收尾记录直接在 main 同步，真实游戏与交付产物不进入仓库。
 
 ## 2026-10-04 Agent 选定范围导出
 
