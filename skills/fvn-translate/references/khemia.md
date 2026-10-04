@@ -39,3 +39,5 @@ uv run fvn-translator agent prepare --source work/echo-project/khemia/source/Khe
 以 Ren’Py 8.3.4 验证脚本、所有五段剧情、名称、centertext、Gallery、音乐室、历史/存读档/设置及常用确认提示。长段内心独白注意文本框容量和断行。按共用流程提供 Windows 0.4 专用补丁及实际安装后完整 ZIP，并在说明记录运行平台限制。
 
 本轮最终 3,517 脚本文本单元完成，3,350 个 AST Say 的实际 Text 渲染无错误/溢出；开场实际推进 110 段对白。lint 与原版基线对比仅增加 7 条百分号接中文标点的旧格式提示，实际显示正常，记录为审查后的误报；不声称 lint 无提示或已完整通关。正式交付与待办见 [交接记录](../../../Docs/ECHO_PROJECT_HANDOFF.md)。
+
+Windows 0.4 补丁及实际安装的完整 ZIP 已上传 Google Drive 并回读文件名、大小和父文件夹。完整 ZIP 为 5 个顺序字节分卷，需将全卷与附带恢复工具下载到同一目录，按逐卷/完整 SHA-256 校验合并后再解压；本地发布验收另检查合并 ZIP CRC 并通过。该分卷源于本轮连接器单文件 100 MiB 上限；全卷齐备也可用 7-Zip 打开 `.zip.001` 解压，只下载首卷无法恢复完整游戏。最终大小、SHA-256、下载 Page 与文件夹链接在交接记录；未实测 Windows EXE 本机启动，未取得工具未返回的服务端哈希。

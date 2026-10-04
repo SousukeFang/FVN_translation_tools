@@ -2,19 +2,37 @@
 
 更新时间：2026-10-04
 
-## Echo Project 本轮交付与剩余范围
+## Echo Project 本轮交付与安全范围收尾
 
 Khemia 3,517 和 Interea 2,296 脚本文本单元正式完成；完整中文字体、共用 66 提示、
 Khemia 21 制作名单说明、实际安装的 Windows ZIP 已验证并按连接器上限分卷上传，
 下载 Page 已回读确认。实际检查使用匹配 Linux SDK，没有 Windows 本机测试或完整通关。
 
-Route 65 5,269 单元已在正式 FTIF 中导入并留 revision，175 单元仍 pending；安全图像/
-UI 覆盖通过匹配引擎检查。本作受限内容的交付范围待用户选择，尚未生成完整游戏包。
-按用户“任务完成后”的条件，work 已提交同步，main 合并和 work 删除仍等待范围完成。
+Route 65 5,269 单元已在正式 FTIF 中导入并留 revision，接受文本范围 5,269 / 5,269
+完成，全部提取 5,444 单元中 175 仍 pending。用户已接受 175 单元及 4 图像在其本地
+原版保留英文；仅交付安全文字纯差量 overlay，不上传完整 Route 65 游戏。安全图像/
+UI 覆盖通过匹配引擎检查；overlay ZIP 的 12 新附件已实际安装核验，1,540 原文件
+SHA-256 全部不变。精确 7.2.2 init/lint return 0，5,231 AST + 38 UI 目标匹配；补丁
+已修正 Route 名牌/对话布局并重打包/安装核对、更新同一 Drive ID，回读名称/大小/父目录。
+原生最长台词/旁白/centered、Start 开场 FileSave/FileLoad/after_load 通过；5,231
+Text 无异常/高度溢出，99 个 italic 边缘外伸 1–4px 位于 30px 右内边距内完整可见。
+102 图像/276 Text 无异常/区域溢出，12 Show 对应核对、实际隔离执行 Carl:9；
+5 菜单仅 QA NullAction 展示。clean lint 的 141 原警告与 baseline 一致、0 新增；
+5,647 字形输入缺字 0。Page 最终运行段已更新，完整回读 38 blocks，三个补丁 ID、
+新 SHA-256/大小、存读档及 175/4 范围一致，旧 hash 无残留。
+本次接受的交付与验收已完成，按用户授权由 Root 合并 main 并删除 work；
+当前记录不声称已执行分支收尾。
 
 Agent 增加显式单位白名单导出，正文和上下文均限于选定范围；不改范围外状态。
-text-spans 支持字面占位模式，真实变量仍可显式保护。当前四项门禁和 102 项离线测试
-通过，详见 [交付与续做记录](ECHO_PROJECT_HANDOFF.md)。
+text-spans 支持字面占位模式，真实变量仍可显式保护。最终重跑 Ruff check 通过、
+Ruff format 的 166 个文件无需改动、Pyright 0 errors / 0 warnings，102 项离线测试
+通过（1.07s）；详见 [交付与续做记录](ECHO_PROJECT_HANDOFF.md)。
+
+纯差量 overlay 不包含原剧情脚本、编译文件、原素材或排除原文；不放宽通用 package
+全量门禁。Drive 完整包按本轮连接器 100 MiB 上限使用 90 MiB 顺序分卷，本地恢复
+SHA-256/ZIP CRC 已核对，上传回读名称/大小/父文件夹；工具未返回服务端哈希。
+Route 65 安全选中集的公共单元校验为 0 errors、5 个已审校接受的 SMART_QUOTE
+warnings，manifest 如实记录；该结果不替代最终实际渲染和存读档验收。
 
 ## Echo Project 接入
 

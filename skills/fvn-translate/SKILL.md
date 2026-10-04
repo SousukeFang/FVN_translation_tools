@@ -9,7 +9,7 @@ description: Translate a furry visual novel directly with an Agent into any requ
 
 ## 1. 识别输入与参考规则
 
-确认游戏版本、平台、原文语言和用户目标语言。语言不局限于英语和中文。下载、解包、真实游戏文本和译文放仓库忽略的 `work/<game>/`，交付文件放忽略的 `output/<game>/<language>/`。
+确认游戏版本、平台、原文语言和用户目标语言，以及本次接受的翻译、保留和交付范围。语言不局限于英语和中文。下载、解包、真实游戏文本和译文放仓库忽略的 `work/<game>/`，交付文件放忽略的 `output/<game>/<language>/`。
 
 按目标游戏读取匹配 reference：
 
@@ -34,6 +34,8 @@ uv run fvn-translator agent prepare --source work/game/source --workspace work/g
 按 reference 添加 `--profile`、`--source-version`，或通用流程的 `--span-map`。查看 `intermediate/extraction_report.json`，解决提取错误和遗漏的剧情字段后再翻译。源目录与工作区分开；续传直接使用已有工作区。
 
 阅读连贯的开场/关键场景及人物定义，整理术语、角色称呼和口吻。将采用的规则存到工作区的 `translation-brief.md`，供所有翻译子代理共享。已有 FTIF `characters.json`、`glossary.json` 可随批次提供；内容少时直接使用简短 brief，无须专门让模型生成所有元数据。
+
+范围包含明确排除项时，分别保存接受的单元白名单和排除位置/类别，不在排除记录摘录受限内容。用 `agent export --unit-ids-file` 导出正式选定范围，正文和相邻上下文均受该白名单约束。范围外单元保留真实状态；接受范围内完成与全项目完成分开报告。用户要求排除内容留在自己的原版中，不授权将该原文复制到补丁或完整游戏分发。
 
 ### 专名与术语的处理规则
 
@@ -86,10 +88,12 @@ uv run fvn-translator agent validate --workspace work/game/translation
 
 按对应 reference 准备字体、运行时脚本等必需附件和游戏专属安装说明。通用流程直接用译文替换已定位的剧情内容，补丁只收录改变的文件。
 
+改变的脚本仍包含本次不允许分发的原文时，不能将整份脚本收入上述通用补丁。采用专属 reference 中经版本与范围验证的纯差量 overlay，只包含允许的目标文字、必要的安全 UI 匹配键、定位元数据及必需附件，由用户的本地原版提供未翻译内容；不绕过全量 `agent package` 门禁或将排除单元标为已完成。Echo: Route 65 的本次安排见其专属 reference 和共用交付规则。
+
 ```bash
 uv run fvn-translator agent package --workspace work/game/translation --output output/game/zh-CN --install-notes work/game/install-notes.md
 ```
 
 附件用 `--extra 游戏内相对路径=本地文件` 或 `--extra-files 附件映射.json`。输出 ZIP、`README.md` 和 `manifest.json`，说明适用版本、安装路径、备份/恢复、覆盖范围与验证情况。
 
-确认 ZIP 清单、安装说明和可下载文件后交付。用户要求 Page 时创建包含文件下载链接和使用说明的 Page。真实游戏、临时文件、翻译响应和成品不提交到 Git；工具或 reference 开发变更按用户要求提交。
+确认 ZIP 清单、安装说明和可下载文件后交付。用户要求 Page 时创建包含真实文件下载链接、明确覆盖范围和使用说明的 Page。若上传需分卷，记录单卷/完整 ZIP 的大小、SHA-256、顺序和恢复方法，实测恢复一致后再交付；按连接器实际返回记录上传验证，不推定服务端哈希已核对。真实游戏、临时文件、翻译响应和成品不提交到 Git；工具或 reference 开发变更按用户要求提交。

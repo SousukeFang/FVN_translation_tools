@@ -61,4 +61,12 @@ Ren’Py 自动发现已知可见文本 sink，命中 Profile 时采用对应规
 
 `package` 不调用会修改正式源目录的 ApplyService。它在独立 staging 校验后只收录变化文件与显式附件。`--extra` 或 `--extra-files` 添加字体/运行脚本，`--install-notes` 添加游戏说明。manifest 记录源/目标 SHA-256、语言、适用版本、覆盖率、文件清单和实际程序校验；引擎启动、字形和文学审校结论放安装说明，按实际执行情况记录。
 
+只接受部分范围的项目仍保留全部权威单元和真实状态。范围内完成不满足通用 `package` 的全量完成条件；不能将排除项标为 skipped、填充原文译文或放宽门禁来打包。改变的源码文件会包含未改原文，若其中有本次不允许再分发的内容，需专属的纯差量 overlay，只包含接受白名单的目标文字、必要的安全 UI 匹配键、定位/哈希元数据和必要附件，由用户本地原版提供其余内容。overlay 必须另做白名单映射、排除项不变、控制流与初始化时机验证；不能夹带原剧情脚本、编译文件、原素材、注释/上下文里的排除内容或完整游戏包。具体实现与覆盖数量写入游戏 reference 和交付说明。
+
+本轮 Echo: Route 65 接受 5,269 个安全文本单元汉化，175 单元及 4 张图像保留用户本地原文，仅交付安全 overlay；FTIF 中 175 单元继续 pending。Khemia 3,517、Interea 2,296 单元全量完成，沿用通用源码补丁与实际安装的完整 ZIP。规则与验证见 [Echo Project 共用 reference](../skills/fvn-translate/references/echo-project-renpy.md) 和 [交付记录](ECHO_PROJECT_HANDOFF.md)。
+
+Route 65 使用忽略工作目录中的确定性附件打包器，manifest schema 为 `fvn-safe-overlay-patch/v1`；不是公共 PatchService 或 CLI 新增能力。该打包器只收原包不存在的新附件，逐选中 ID 调用公共 `validate_unit`，检查全部排除单元 pending 且无 target。在独立原版 Windows 副本实际写附件，并核对全部原始文件 SHA-256 未改变，不生成或上传完整游戏 ZIP。安装与回退只处理自身附件清单，不移走未替换的原 `.rpyc`。
+
+上传要按连接器实际限制处理。本轮 Drive 对超过 100 MiB 的单文件返回 413，完整 ZIP 因而按 90 MiB 顺序字节分卷，并附逐卷/完整 SHA-256、大小与恢复工具。工具校验分卷大小/SHA-256 和合并 ZIP SHA-256；本地发布验收另执行 ZIP CRC 验证。先本地恢复核对，再上传各游戏子文件夹并回读名称、大小和父文件夹；未返回服务端哈希时不声称核对过。Page 明确分卷数量、全卷下载和恢复后解压方法，也可全卷齐备后用 7-Zip 打开 `.zip.001` 解压，不把文件夹链接标为单 ZIP 直链。
+
 真实安装包、游戏脚本、FTIF、响应、下载字体与最终补丁均保存在忽略目录。测试使用合成 fixture，不调用真实翻译 API。
