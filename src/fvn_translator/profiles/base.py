@@ -35,6 +35,8 @@ class CustomTextSink(ProfileModel):
     function: str
     argument: int = Field(default=0, ge=0)
     keyword: str | None = None
+    dictionary_value_key: str | None = None
+    literal_fragments: bool = False
     unit_type: UnitType = UnitType.OTHER_VISIBLE_TEXT
 
 

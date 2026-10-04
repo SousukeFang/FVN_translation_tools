@@ -24,3 +24,9 @@ FTIF（FVN Translation Intermediate Format）是 UTF-8 JSON/JSONL 格式。所�
 - `apply.status`：`not_applied|applied|apply_failed`。
 
 译文来源为 `llm|human|translation_memory|cache|imported`。每次修改增加 `revision`，并同步追加 revisions 记录。机器可读定义见 [`schemas/`](schemas/)。
+
+公共占位符自动推断不会将普通百分比后的空格（如 `10% slope`）猜成 printf 的 `% s`。
+带映射键、宽度或精度的格式（如 `%(name) s`、`% 8.2f`）仍自动保护；已经明确是
+printf 模板的单元可以设置 `constraints.printf_format=true`，保护无宽度的空格标志格式。
+既有 `protected_tokens` 声明始终参与计数校验，不因自动推断边界调整而失去保护。
+`placeholder_mode=explicit` 仍只按该单元明确声明的保护范围校验。

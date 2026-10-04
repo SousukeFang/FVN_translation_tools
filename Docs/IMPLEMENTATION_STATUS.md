@@ -2,6 +2,14 @@
 
 更新时间：2026-10-04
 
+## A Role to Play 接入与汉化
+
+官方 Windows 0.051（页面标注 0.05）已下载并确认 Ren’Py 8.0.3.22090809 / Python 3.9。
+新增专属 Profile/reference，完善跨行自定义 sink、选择字段、格式片段、绑定名与模块许可保护，
+修复自然百分比的假 printf 校验和纯括号 Gallery 页码遗漏。四项门禁通过，123 项离线测试通过，Schema 示例有效。
+最终正式 5,779 脚本单元全部导入并留 revision（其中 1 原样模块许可），另完成 96 引擎提示与
+33 图像补充；staging 回写校验 0 issues。成品运行/上传结果见 [本轮交接](AROTP_HANDOFF.md)。
+
 ## Echo Project 本轮交付与安全范围收尾
 
 Khemia 3,517 和 Interea 2,296 脚本文本单元正式完成；完整中文字体、共用 66 提示、

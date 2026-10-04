@@ -15,9 +15,16 @@ def validate_unit(unit: TranslationUnit) -> list[Issue]:
             token for token in unit.protected_tokens for _ in range(unit.target_text.count(token))
         ]
     else:
-        source = extract_placeholders(unit.source_text)
-        target = extract_placeholders(unit.target_text)
-    if sorted(source) != sorted(target):
+        printf_format = unit.constraints.get("printf_format") is True
+        source = extract_placeholders(unit.source_text, printf_format=printf_format)
+        target = extract_placeholders(unit.target_text, printf_format=printf_format)
+    # Explicit declarations remain authoritative even when automatic inference
+    # deliberately declines an ambiguous token such as printf's ``% s``.
+    declared_changed = any(
+        unit.source_text.count(token) != unit.target_text.count(token)
+        for token in unit.protected_tokens
+    )
+    if sorted(source) != sorted(target) or declared_changed:
         issues.append(
             _issue(
                 unit,

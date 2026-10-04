@@ -6,7 +6,12 @@ from fvn_translator.adapters.base import AdapterConfig
 from fvn_translator.adapters.renpy import RenPyAdapter
 from fvn_translator.models import UnitType
 from fvn_translator.profiles import default_profile_registry
-from fvn_translator.profiles.echo_project import EchoRoute65Profile, IntereaProfile, KhemiaProfile
+from fvn_translator.profiles.echo_project import (
+    ARoleToPlayProfile,
+    EchoRoute65Profile,
+    IntereaProfile,
+    KhemiaProfile,
+)
 
 
 def _write(source: Path, relative: str, text: str) -> None:
@@ -15,7 +20,9 @@ def _write(source: Path, relative: str, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-@pytest.mark.parametrize("factory", [EchoRoute65Profile, KhemiaProfile, IntereaProfile])
+@pytest.mark.parametrize(
+    "factory", [EchoRoute65Profile, KhemiaProfile, IntereaProfile, ARoleToPlayProfile]
+)
 def test_echo_profiles_require_distinct_title_and_story_signature(tmp_path, factory) -> None:
     profile = factory()
     _write(tmp_path, "game/options.rpy", f'define config.name = _("{profile.title}")\n')

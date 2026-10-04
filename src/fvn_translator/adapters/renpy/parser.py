@@ -10,10 +10,12 @@ from fvn_translator.profiles.base import CustomTextSink, SceneRules
 
 from .lexer import RenPyLexer
 from .models import ParseResult, StringToken, TextNode
+from .protected_tokens import protection_signature
 from .statements import (
     SCREEN_KEYWORDS,
     TRANSLATION_FUNCTIONS,
     is_menu_choice_suffix,
+    is_parenthesized_literal,
     is_show_text,
     literal_argument_index,
     parse_say_prefix,
@@ -28,13 +30,18 @@ ATL_BLOCK = re.compile(
 NON_TEXT_STATEMENTS = frozenset(
     {
         "background",
+        "activate_sound",
         "base_bar",
+        "blend",
         "bottom_bar",
         "font",
         "foreground",
+        "focus_mask",
         "hover_background",
         "hover_color",
         "hover_foreground",
+        "hover_sound",
+        "hover_thumb",
         "id",
         "idle",
         "idle_background",
@@ -187,7 +194,7 @@ class RenPyParser:
             if not tokens:
                 continue
             statement_start = continuation_start
-            statement_end = _statement_end(text, line_starts, tokens)
+            statement_end = _statement_end(text, line_starts, tokens, delimiter_depths)
             statement_strings = lexed.strings[
                 bisect_left(token_starts, statement_start) : bisect_left(
                     token_starts, statement_end
@@ -295,7 +302,16 @@ class RenPyParser:
             keyword = stripped.split(None, 1)[0] if stripped else ""
             if keyword in SCREEN_KEYWORDS and not (keyword == "label" and stripped.endswith(":")):
                 expression_start = line_absolute + line.find(keyword) + len(keyword)
-                if not text[expression_start : first.start].strip():
+                before_literal = text[expression_start : first.start]
+                parenthesized = is_parenthesized_literal(
+                    before_literal, text[first.end : statement_end]
+                )
+                visible_literal = first.value
+                if parenthesized:
+                    signature = protection_signature(first.value)
+                    for protected in (*signature["tags"], *signature["interpolations"]):
+                        visible_literal = visible_literal.replace(protected, "")
+                if not before_literal.strip() or parenthesized and visible_literal.strip():
                     return [
                         TextNode(
                             kind=f"screen_{keyword}",
@@ -386,6 +402,8 @@ class RenPyParser:
                     statement_end=base["statement_end"],
                     strings=statement_strings,
                     keyword=sink.keyword,
+                    dictionary_value_key=sink.dictionary_value_key,
+                    literal_fragments=sink.literal_fragments,
                 )
                 if argument == sink.argument:
                     nodes.append(
@@ -396,6 +414,7 @@ class RenPyParser:
                             text_role=f"argument-{sink.argument}",
                             context={
                                 "function": sink.function,
+                                "function_argument": sink.keyword or sink.argument,
                                 "statement_prefix": text[
                                     token.start - token.start_column : token.start
                                 ],
@@ -482,8 +501,12 @@ def _line_starts(text: str) -> list[int]:
     return starts
 
 
-def _statement_end(text: str, starts: list[int], tokens: list[StringToken]) -> int:
+def _statement_end(
+    text: str, starts: list[int], tokens: list[StringToken], delimiter_depths: list[int]
+) -> int:
     last_line = max(token.end_line for token in tokens)
+    while last_line < len(delimiter_depths) and delimiter_depths[last_line] > 0:
+        last_line += 1
     return starts[last_line] if last_line < len(starts) else len(text)
 
 

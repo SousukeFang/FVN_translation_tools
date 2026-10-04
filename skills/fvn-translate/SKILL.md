@@ -17,9 +17,10 @@ description: Translate a furry visual novel directly with an Agent into any requ
 - 《Echo: Route 65》：[专属 reference](references/echo-route-65.md)。
 - 《Khemia》：[专属 reference](references/khemia.md)。
 - 《Interea》：[专属 reference](references/interea.md)。
+- 《A Role to Play》：[专属 reference](references/a-role-to-play.md)。
 - 其他 FVN：[通用 reference](references/generic.md)。
 
-Echo Project 的三份专属 reference 共用 [引擎、字体、图像文字与交付流程](references/echo-project-renpy.md)，但分别采用真实包对应的 Profile 和 Ren’Py 版本。只有命中的 reference 及其共用规则需要加载；新游戏的处理要点写入新的 reference，核心流程继续使用本文件。
+Echo Project 的专属 reference 共用 [引擎、字体、图像文字与交付流程](references/echo-project-renpy.md)，但分别采用真实包对应的 Profile 和 Ren’Py 版本。只有命中的 reference 及其共用规则需要加载；新游戏的处理要点写入新的 reference，核心流程继续使用本文件。
 
 检查真实输入的引擎、剧情位置、角色定义、UI、字体与既有译文。参考中的旧版本统计只作线索，本次提取报告才是覆盖范围依据。
 
@@ -96,4 +97,4 @@ uv run fvn-translator agent package --workspace work/game/translation --output o
 
 附件用 `--extra 游戏内相对路径=本地文件` 或 `--extra-files 附件映射.json`。输出 ZIP、`README.md` 和 `manifest.json`，说明适用版本、安装路径、备份/恢复、覆盖范围与验证情况。
 
-确认 ZIP 清单、安装说明和可下载文件后交付。用户要求 Page 时创建包含真实文件下载链接、明确覆盖范围和使用说明的 Page。若上传需分卷，记录单卷/完整 ZIP 的大小、SHA-256、顺序和恢复方法，实测恢复一致后再交付；按连接器实际返回记录上传验证，不推定服务端哈希已核对。真实游戏、临时文件、翻译响应和成品不提交到 Git；工具或 reference 开发变更按用户要求提交。
+确认 ZIP 清单、安装说明和可下载文件后交付。用户要求 Page 时，默认只发布汉化补丁下载与面向玩家的说明：适用版本、安装/回退、覆盖范围、校验值、已知限制和许可。skill 源码、工具扩展包、内部验收文件保存在仓库或工作区，不加入补丁 Page。若上传需分卷，记录单卷/完整 ZIP 的大小、SHA-256、顺序和恢复方法，实测恢复一致后再交付；按连接器实际返回记录上传验证，不推定服务端哈希已核对。真实游戏、临时文件、翻译响应和成品不提交到 Git；工具或 reference 开发变更按用户要求提交并推送，通过仓库门禁后核对远端提交。

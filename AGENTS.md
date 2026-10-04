@@ -13,7 +13,7 @@
 - [实现状态与 Gate A](Docs/IMPLEMENTATION_STATUS.md)
 - [Agent 翻译模式](Docs/12-agent-translation.md)
 
-Agent 直接翻译游戏时加载 [FVN 翻译 skill](skills/fvn-translate/SKILL.md)，只读取匹配的 reference。待继续的 Part II 汉化见 [交接文档](Docs/HANDOFF.md)。
+Agent 直接翻译游戏时加载 [FVN 翻译 skill](skills/fvn-translate/SKILL.md)，只读取匹配的 reference。Part II 汉化见 [交接文档](Docs/HANDOFF.md)，A Role to Play 本轮记录见 [交接文档](Docs/AROTP_HANDOFF.md)。
 
 # Agents 运行规范
 
@@ -50,7 +50,7 @@ Agent 直接翻译游戏时加载 [FVN 翻译 skill](skills/fvn-translate/SKILL.
    - 公共 Adapter 放在 `src/fvn_translator/adapters/<adapter_id>/`，游戏专属配置和样本可放在对应 FVN 目录。
    - 新 Adapter 必须遵循 `Docs/04-adapter-contract.md` 并通过公共契约测试。
    - 当前已进入 Ren’Py 与 Agent 翻译阶段；历史 Gate A/B 的人工演示缺口记录在实现状态中。
-   - 当前 FVN 目标为 Remember the Flowers - Part II。
+   - 当前 FVN 目标为 A Role to Play；匹配 Profile 和独立 reference 已接入。
 
 9. Agent 翻译与交付
    - `skills/fvn-translate/SKILL.md` 保留核心流程；每个游戏的翻译与打包要求放独立 reference。

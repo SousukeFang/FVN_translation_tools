@@ -1,16 +1,17 @@
 # Echo Project：共用 Ren’Py 流程
 
-本 reference 供 [Echo: Route 65](echo-route-65.md)、[Khemia](khemia.md)、[Interea](interea.md) 的专属 reference 共用。先读取目标游戏 reference，再读取本文件；不要把同一制作组视为同一引擎版本或同一 UI。
+本 reference 供 [Echo: Route 65](echo-route-65.md)、[Khemia](khemia.md)、[Interea](interea.md)、[A Role to Play](a-role-to-play.md) 的专属 reference 共用。先读取目标游戏 reference，再读取本文件；不要把同一制作组视为同一引擎版本或同一 UI。
 
 ## 已核对的架构
 
-2026-10-03 从官方 itch.io 页面实际下载的 Windows 包均有可读 UTF-8 `.rpy`，无需先解包 RPA。三个包都同时带 `.rpyc`，原包完整性检查通过。Ren’Py 对白、旁白、菜单、screen 和 `_()` 的基础处理可复用，角色定义、故事入口、图像文字及字体必须分别处理。
+2026-10-03 核对的前三个官方 Windows 包与 2026-10-04 下载的 A Role to Play 均有可读 UTF-8 `.rpy`，无需先解包 RPA；它们同时带 `.rpyc`，原包完整性检查通过。Ren’Py 对白、旁白、菜单、screen 和 `_()` 的基础处理可复用，角色定义、故事入口、图像文字及字体必须分别处理。
 
 | 游戏 | Windows 包 | 实包引擎 | 剧情布局 | UI |
 | --- | --- | --- | --- | --- |
 | Echo: Route 65 | `EchoRoute65-1.01-pc.zip` | 7.2.2 | `Saturday.rpy`、`Carl.rpy`、`Jas.rpy`、`TJ.rpy` | 旧版定制 screen，姓名和按钮大量使用图片 |
 | Khemia | `Khemia-0.4-win.zip` | 8.3.4.24120703 | `a1s1`–`a1s3`、`a2s1`、`a2s2` | `gui.rpy`、gallery、music room |
 | Interea | `Interea-0.4-win.zip` | 7.4.4 | `a1s1`–`a1s4`；另有仅编译的旧 `a2s2`，本轮恢复核对 | `gui.rpy` 与 screen |
+| A Role to Play | `ARoletoPlay-0.051-win.zip` | 8.0.3.22090809 / Python 3.9 | `Week1.rpy`、`Week2.rpy`，第二周含 Megan/CW 分支 | 定制 UI、phone archive/messenger、Gallery、音乐播放器 |
 
 引擎版本来自包内 `renpy/__init__.py` 或 `renpy/vc_version.py`。后续下载可能改变构建，必须重新核对 SHA-256、引擎版本和 `.rpy`/`.rpyc` 差集。Route 65 的 `config.name="Echo"`、`config.version="0.0"` 是旧内部元数据，不能代替下载包版本 1.01。
 
@@ -18,7 +19,7 @@
 
 使用 `work/echo-project/<slug>/` 保存原 ZIP、`pristine/`、独立 `source/`、`translation/`、任务、响应、字体和检查记录。`pristine/` 是未改原版，源目录与翻译工作区分开；Windows 成品在独立 `patched/` 副本上安装。真实游戏、文字、字体和交付 ZIP 不提交到 Git。
 
-专属 Profile ID 分别为 `echo-route-65`、`khemia`、`interea`。共用抽取 sink 包含 Character 第一个参数/`name=`、`renpy.input`、`renpy.notify`；角色 roster 同时保留 Ren’Py 的 `centered` 等实际可用 speaker。空显示名、资源路径、style 值、第三方实现代码、ATL 与跨行图像表达式不能成为译文任务。
+专属 Profile ID 分别为 `echo-route-65`、`khemia`、`interea`、`a-role-to-play`。共用抽取 sink 包含 Character 第一个参数/`name=`、`renpy.input`、`renpy.notify`；角色 roster 同时保留 Ren’Py 的 `centered` 等实际可用 speaker。A Role to Play 另有经明确字段定位的手机/聊天、Gallery 与 Text 状态 sink，细则见专属 reference。空显示名、资源路径、style 值、第三方实现代码、ATL 与跨行图像表达式不能成为译文任务。
 
 先检查提取报告并按文件/type/speaker 汇总。通用无 Profile 抽取在这些实包里会把顶层 `style ...` 的 `font`、`background`、`variant`、`layout`、色值等误当对白；零错误不代表覆盖正确。专属 Profile 的角色过滤也不能遗漏 `$` 赋值、动态 speaker 或显式名字对白。对比无 Profile 清单和实际角色定义，逐项解释差异。
 
