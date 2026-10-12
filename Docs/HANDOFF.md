@@ -73,6 +73,15 @@ Ruff、格式检查、Pyright、75 项离线测试及 FTIF Schema 示例通过�
 
 原包 lint 自带大量未使用旧素材的 not loadable 提示和 kinetic text tags SyntaxWarnings；按原版与补丁的差异核对，不宣称原版 lint 完全无提示。Windows EXE 本机启动尚未实测，已在交付说明标明。r2 字体中文缺字/丢字均为 0，1,509 个剧情单元重新渲染仍无异常/溢出，最高 159px。最后 lint 相对 Windows 原版逐条新增/删除消息均为 0，原资源提示仍为 3,123 项。ZIP、说明、SHA256SUMS 和验证记录通过下载 Page 交付；本轮运行与截图证据位于 `work/rtf/runtime/name-policy-r2/`，首版证据保留。
 
+## Drive 补传核对（2026-10-12）
+
+已将 r2 补丁和 ZIP 内原样安装说明补传至 `Game / Game Patch / Remember the Flowers Part II 0.02 Windows 简体中文 r2` [文件夹](https://drive.google.com/drive/folders/1A8jJUSDXBOGY8FOHLhr98VwY8vztl_fr)。
+
+- [补丁 ZIP](https://drive.google.com/file/d/1atJUXaHsLRMM5pI-dcZamyrszp1jDTy4/view?usp=drivesdk)：776,969 字节；上传前 SHA-256 为 `73bc2669ccff51db9cb308b1f1f619faa0df60ea6ee94b391bf8c2e787af5edf`，与原下载 Page 的校验清单及本交接记录一致。
+- [安装说明](https://drive.google.com/file/d/1f72FBeunt0ot1tkG6ad20TdPFbMJJcZ4/view?usp=drivesdk)：6,571 字节，从同一 ZIP 的 `README.md` 原样提取。
+
+上传来源为用户提供的同版 ZIP；当前服务器未保留原 `work/rtf/` 与 `output/rtf/` 目录。上传前 ZIP CRC、14 项条目和 manifest 中 12 个游戏文件的大小/目标 SHA-256 均通过。上传后已回读两文件名称、大小与父目录；连接器未返回云端内容哈希，不将元数据回读视为云端 SHA-256 校验。本次仅补传补丁与安装说明。
+
 ## 后续工作
 
 后续使用 r2 的专名保留规范，不回退到初版强制音译方案。若用户报告问题，先核对原包/补丁哈希和版本，在新登记批次中通过响应导入修订，保留 revision 后重新生成字体子集与补丁。若升级上游版本，重新 prepare 并核对提取范围，不能直接混用本补丁。
