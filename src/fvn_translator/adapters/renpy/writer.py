@@ -11,6 +11,7 @@ from fvn_translator.models import TranslationUnit
 
 from .lexer import RenPyLexer
 from .protected_tokens import compare_signatures, protection_signature
+from .text_codec import RENPY_TEXT_ESCAPES, decode_renpy_text_content
 
 
 class RenPyWriter:
@@ -52,14 +53,23 @@ class RenPyWriter:
                 target = unit.target_text or unit.source_text
                 quote = str(unit.adapter_data["quote"])
                 prefix = str(unit.adapter_data.get("string_prefix", ""))
+                escape_mode = unit.adapter_data.get("escape_mode")
                 rendered = (
                     expected
                     if target == unit.source_text
                     else encode_string_content(
-                        target, quote=quote, raw_prefix="r" in prefix.lower()
+                        target,
+                        quote=quote,
+                        raw_prefix="r" in prefix.lower(),
+                        escape_mode=str(escape_mode) if escape_mode is not None else None,
+                        source_raw_content=expected,
                     )
                 )
-                signature = protection_signature(target, rendered)
+                signature = protection_signature(
+                    target,
+                    rendered,
+                    escape_mode=str(escape_mode) if escape_mode is not None else None,
+                )
                 expected_signature = dict(unit.adapter_data["protection_signature"])
                 problems = compare_signatures(expected_signature, signature)
                 if problems:
@@ -77,12 +87,32 @@ class RenPyWriter:
         return written
 
 
-def encode_string_content(value: str, *, quote: str, raw_prefix: bool = False) -> str:
+def encode_string_content(
+    value: str,
+    *,
+    quote: str,
+    raw_prefix: bool = False,
+    escape_mode: str | None = None,
+    source_raw_content: str | None = None,
+) -> str:
+    if escape_mode not in {None, RENPY_TEXT_ESCAPES}:
+        raise ValueError(f"Unsupported Ren'Py escape mode: {escape_mode}")
+    if escape_mode == RENPY_TEXT_ESCAPES and (raw_prefix or len(quote) != 1):
+        raise ValueError("Ren'Py text escape mode only supports ordinary non-raw literals")
     if raw_prefix:
         if quote in value:
             raise ValueError("A raw Ren'Py string cannot safely contain its original quote")
         return value
     quote_character = quote[0]
+    # Legacy triple literals protect the spelling of explicit escapes as well
+    # as decoded text. Preserve each source newline's ordered spelling rather
+    # than turning mixed physical/escaped newlines into all-physical newlines.
+    newline_spellings = (
+        _triple_newline_spellings(source_raw_content)
+        if len(quote) == 3 and source_raw_content is not None
+        else None
+    )
+    newline_index = 0
     output: list[str] = []
     braces = 0
     brackets = 0
@@ -103,10 +133,26 @@ def encode_string_content(value: str, *, quote: str, raw_prefix: bool = False) -
             brackets -= 1
         if char == "\\":
             output.append("\\\\")
-        elif char == quote_character and not braces and not brackets:
+        elif char == quote_character and (
+            escape_mode == RENPY_TEXT_ESCAPES or not braces and not brackets
+        ):
             output.append(f"\\{quote_character}")
+        elif newline_spellings is not None and char in {"\n", "\r"}:
+            if (
+                newline_index >= len(newline_spellings)
+                or newline_spellings[newline_index][0] != char
+            ):
+                raise ValueError("Triple literal semantic newline sequence changed")
+            output.append(newline_spellings[newline_index][1])
+            newline_index += 1
         elif len(quote) == 1 and char == "\n":
             output.append("\\n")
+        elif escape_mode == RENPY_TEXT_ESCAPES and (
+            char in {"\t", "\r"}
+            or char == " "
+            and (value[index - 1 : index] == " " or value[index + 1 : index + 2] == " ")
+        ):
+            output.append(f"\\u{ord(char):04x}")
         elif len(quote) == 1 and char == "\r":
             if index + 1 < len(value) and value[index + 1] == "\n":
                 index += 1
@@ -116,7 +162,30 @@ def encode_string_content(value: str, *, quote: str, raw_prefix: bool = False) -
         else:
             output.append(char)
         index += 1
-    return "".join(output)
+    rendered = "".join(output)
+    if newline_spellings is not None and newline_index != len(newline_spellings):
+        raise ValueError("Triple literal semantic newline sequence changed")
+    if escape_mode == RENPY_TEXT_ESCAPES and decode_renpy_text_content(rendered) != value:
+        raise ValueError("Target cannot round-trip through the Ren'Py text codec")
+    return rendered
+
+
+def _triple_newline_spellings(raw: str) -> list[tuple[str, str]]:
+    """Follow the legacy lexer escapes without confusing literal \\n with NL."""
+    result = []
+    escapes = {"n": "\n", "r": "\r", "t": "\t", "\\": "\\", '"': '"', "'": "'"}
+    index = 0
+    while index < len(raw):
+        if raw[index] == "\\" and index + 1 < len(raw) and raw[index + 1] in escapes:
+            decoded = escapes[raw[index + 1]]
+            if decoded in {"\n", "\r"}:
+                result.append((decoded, raw[index : index + 2]))
+            index += 2
+        else:
+            if raw[index] in {"\n", "\r"}:
+                result.append((raw[index], raw[index]))
+            index += 1
+    return result
 
 
 def prepare_staging_project(source_root: Path, staging_root: Path) -> None:

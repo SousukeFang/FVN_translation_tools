@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from bisect import bisect_left
+from dataclasses import replace
 from typing import TypedDict
 
 from fvn_translator.core.hashing import bytes_hash
@@ -20,6 +21,8 @@ from .statements import (
     literal_argument_index,
     parse_say_prefix,
 )
+from .statements.assignment import literal_assignment_matches
+from .text_codec import RENPY_TEXT_ESCAPES, decode_renpy_text_content
 
 LABEL = re.compile(r"^\s*label\s+(?P<name>[A-Za-z_]\w*)\s*:")
 SCREEN = re.compile(r"^\s*screen\s+[A-Za-z_]\w*")
@@ -69,6 +72,7 @@ DISALLOWED_SAY = frozenset(
         "define",
         "default",
         "image",
+        "attribute",
         "play",
         "queue",
         "stop",
@@ -144,7 +148,7 @@ class RenPyParser:
         label = "<file>"
         scene_index = 0
         screen_indent: int | None = None
-        menu_indent: int | None = None
+        menu_indents: list[int] = []
         python_indent: int | None = None
         atl_indent: int | None = None
         visible_index = 0
@@ -160,12 +164,8 @@ class RenPyParser:
             if stripped and not stripped.startswith("#"):
                 if screen_indent is not None and indent <= screen_indent and not SCREEN.match(line):
                     screen_indent = None
-                if (
-                    menu_indent is not None
-                    and indent <= menu_indent
-                    and not stripped.startswith("menu")
-                ):
-                    menu_indent = None
+                while menu_indents and indent <= menu_indents[-1]:
+                    menu_indents.pop()
                 if (
                     python_indent is not None
                     and indent <= python_indent
@@ -181,7 +181,7 @@ class RenPyParser:
             if SCREEN.match(line):
                 screen_indent = indent
             if re.match(r"^\s*menu(?:\s+[^:]*)?\s*:", line):
-                menu_indent = indent
+                menu_indents.append(indent)
             if PYTHON_BLOCK.match(line):
                 python_indent = indent
             if ATL_BLOCK.match(line) and atl_indent is None:
@@ -212,7 +212,7 @@ class RenPyParser:
                 scene_id,
                 visible_index,
                 screen_indent is not None and indent > screen_indent,
-                menu_indent is not None and indent > menu_indent,
+                bool(menu_indents) and indent > menu_indents[-1],
                 python_indent is not None and indent > python_indent,
                 previous_dialogue_index,
                 atl_indent is not None and indent > atl_indent,
@@ -221,6 +221,20 @@ class RenPyParser:
             )
             if classified:
                 for node in classified:
+                    if (
+                        node.kind
+                        in {"say", "say_explicit", "explicit_display_name", "extend", "menu"}
+                        and len(node.token.quote) == 1
+                        and "r" not in node.token.prefix.lower()
+                    ):
+                        node.token = replace(
+                            node.token, value=decode_renpy_text_content(node.token.raw_content)
+                        )
+                        node.context["escape_mode"] = RENPY_TEXT_ESCAPES
+                        if node.kind == "say_explicit":
+                            display_name = classified[0].token.value
+                            node.speaker = display_name
+                            node.explicit_display_name = display_name
                     if not node.token.value.strip():
                         continue
                     if any(prefix in node.token.prefix.lower() for prefix in ("f", "b")):
@@ -394,6 +408,30 @@ class RenPyParser:
         nodes: list[TextNode] = []
         for token in tokens:
             for sink in sinks:
+                if sink.assignment_target is not None:
+                    if token.value in sink.excluded_values:
+                        continue
+                    if literal_assignment_matches(
+                        text,
+                        target=sink.assignment_target,
+                        token=token,
+                        statement_start=base["statement_start"],
+                        statement_end=base["statement_end"],
+                        dictionary_value_key=sink.dictionary_value_key,
+                        literal_fragments=sink.literal_fragments,
+                    ):
+                        nodes.append(
+                            TextNode(
+                                kind="assignment",
+                                unit_type=sink.unit_type,
+                                token=token,
+                                text_role="assignment-value",
+                                context={"assignment_target": sink.assignment_target},
+                                **base,
+                            )
+                        )
+                        break
+                    continue
                 argument = literal_argument_index(
                     text,
                     function=sink.function,

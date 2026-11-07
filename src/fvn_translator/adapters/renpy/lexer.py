@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from fvn_translator.models import Issue, Severity
 
 from .models import CommentToken, LexResult, StringToken
@@ -97,6 +99,7 @@ class RenPyLexer:
         index = content_start
         braces = 0
         brackets = 0
+        first_newline: int | None = None
         while index < len(text):
             char = text[index]
             if char == "\\":
@@ -112,6 +115,14 @@ class RenPyLexer:
                 brackets -= 1
             if braces == 0 and brackets == 0 and text.startswith(quote, index):
                 end = index + len(quote)
+                if first_newline is not None:
+                    # Ren'Py ordinary strings may wrap physical lines. A closing quote
+                    # in the middle of a new statement instead belongs to recovery.
+                    line_end = text.find("\n", end)
+                    suffix = text[end : len(text) if line_end < 0 else line_end].strip()
+                    if suffix and not re.match(r"(?:#|:|if\b|with\b|nointeract\b|id\b)", suffix):
+                        index = first_newline
+                        break
                 prefix = text[start:quote_index]
                 raw_content = text[content_start:index]
                 start_line, start_column = _line_column(text, start)
@@ -132,13 +143,13 @@ class RenPyLexer:
                     value=decode_string_content(raw_content, raw_prefix="r" in prefix.lower()),
                 )
                 return token, end, None
-            if not triple and char in "\r\n":
-                break
+            if not triple and char in "\r\n" and first_newline is None:
+                first_newline = index
             index += 1
         line, _ = _line_column(text, start)
         return (
             None,
-            self._safe_boundary(text, index),
+            self._safe_boundary(text, first_newline if first_newline is not None else index),
             self._issue(path, line, "RENPY_UNCLOSED_STRING", "Unclosed string literal"),
         )
 

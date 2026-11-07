@@ -25,6 +25,7 @@ class ProfileRegistry:
 def default_profile_registry() -> ProfileRegistry:
     from .echo_project import ARoleToPlayProfile, EchoRoute65Profile, IntereaProfile, KhemiaProfile
     from .remember_the_flowers import RememberTheFlowersProfile
+    from .the_smoke_room import TheSmokeRoomProfile
 
     registry = ProfileRegistry()
     registry.register("remember-the-flowers-ii", RememberTheFlowersProfile)
@@ -32,4 +33,5 @@ def default_profile_registry() -> ProfileRegistry:
     registry.register("khemia", KhemiaProfile)
     registry.register("interea", IntereaProfile)
     registry.register("a-role-to-play", ARoleToPlayProfile)
+    registry.register("the-smoke-room", TheSmokeRoomProfile)
     return registry

@@ -108,7 +108,10 @@ def test_legacy_workspace_cannot_package_translated_attribution(tmp_path: Path) 
     source, workspace, repository, _ = _project(tmp_path)
     legacy = _legacy_units(repository)
     attribution = next(unit for unit in legacy if "Synthetic Contributor" in unit.source_text)
-    attribution.target_text = "修改过的许可致谢。\r\n"
+    attribution.target_text = attribution.source_text.replace(
+        "Synthetic Contributor", "被替换的署名"
+    )
+    # Keep the newline structure valid so this reaches the license profile guard.
     # Legacy public validation has no full-text protection; the profile must still stop it.
     assert not validate_unit(attribution)
     assert {

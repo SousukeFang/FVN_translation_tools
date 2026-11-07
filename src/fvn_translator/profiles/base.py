@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Protocol
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from fvn_translator.adapters.base import ValidationReport
 from fvn_translator.models import TranslationUnit, UnitType
@@ -32,12 +32,22 @@ class CharacterDefinition(ProfileModel):
 
 
 class CustomTextSink(ProfileModel):
-    function: str
+    function: str = ""
+    assignment_target: str | None = None
     argument: int = Field(default=0, ge=0)
     keyword: str | None = None
     dictionary_value_key: str | None = None
     literal_fragments: bool = False
+    excluded_values: tuple[str, ...] = ()
     unit_type: UnitType = UnitType.OTHER_VISIBLE_TEXT
+
+    @model_validator(mode="after")
+    def require_one_locator(self) -> "CustomTextSink":
+        if bool(self.function) == bool(self.assignment_target):
+            raise ValueError("A text sink needs exactly one function or assignment target")
+        if self.assignment_target is not None and not self.assignment_target.isidentifier():
+            raise ValueError("Assignment text sinks require a plain variable name")
+        return self
 
 
 class SceneRules(ProfileModel):
