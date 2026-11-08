@@ -6,6 +6,11 @@ from .placeholders import extract_placeholders
 
 
 def validate_unit(unit: TranslationUnit) -> list[Issue]:
+    # An absent draft leaves the source in staging. There is no target token
+    # stream to compare yet; packaging checks completion separately, while the
+    # adapter still verifies the staged source text and its protected content.
+    if not unit.target_text and unit.translation.status not in {"translated", "reviewed"}:
+        return []
     issues: list[Issue] = []
     if unit.constraints.get("placeholder_mode") == "explicit":
         source = [

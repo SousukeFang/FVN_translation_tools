@@ -4,6 +4,8 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 
+from .text_codec import RENPY_DEQUOTE, RENPY_TEXT_ESCAPES, dequote_renpy_escape
+
 TAG_NAME = re.compile(r"^/?(?P<name>[A-Za-z#][\w#-]*)")
 SELF_CLOSING = frozenset({"w", "p", "nw", "fast", "clear", "space", "vspace", "#"})
 ProtectionSignature = dict[str, list[str]]
@@ -15,11 +17,17 @@ class ProtectionIssue:
     message: str
 
 
-def protection_signature(text: str, raw_text: str | None = None) -> ProtectionSignature:
+def protection_signature(
+    text: str, raw_text: str | None = None, *, escape_mode: str | None = None
+) -> ProtectionSignature:
     tags = _balanced_tokens(text, "{", "}", "{{")
     interpolations = _balanced_tokens(text, "[", "]", "[[")
     raw = raw_text if raw_text is not None else text
-    escapes = _escape_tokens(raw)
+    if escape_mode not in {None, RENPY_TEXT_ESCAPES}:
+        raise ValueError(f"Unsupported Ren'Py escape mode: {escape_mode}")
+    escapes = (
+        _renpy_text_escape_tokens(raw) if escape_mode == RENPY_TEXT_ESCAPES else _escape_tokens(raw)
+    )
     return {
         "tags": tags,
         "interpolations": interpolations,
@@ -128,6 +136,33 @@ def _escape_tokens(raw: str) -> list[str]:
             tokens.append(raw[index : index + 2])
             index += 2
             continue
+        index += 1
+    return tokens
+
+
+def _renpy_text_escape_tokens(raw: str) -> list[str]:
+    r"""Protect meaningful rendered escapes, not discarded spelling such as \T."""
+    tokens: list[str] = []
+    canonical = {"\n": "\\n", "\t": "\\t", "\r": "\\r", "\\": "\\\\", '"': '\\"', "'": "\\'"}
+    index = 0
+    while index < len(raw):
+        if raw.startswith(("%%", "{{", "[["), index):
+            tokens.append(raw[index : index + 2])
+            index += 2
+            continue
+        match = RENPY_DEQUOTE.match(raw, index)
+        if match:
+            decoded = dequote_renpy_escape(match)
+            if decoded in canonical:
+                tokens.append(canonical[decoded])
+            elif decoded in {"%%", "{{", "[["}:
+                tokens.append(decoded)
+            index = match.end()
+            continue
+        if raw[index] == "\t":
+            tokens.append("\\t")
+        elif raw[index] == "\r" and not raw.startswith("\r\n", index):
+            tokens.append("\\r")
         index += 1
     return tokens
 

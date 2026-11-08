@@ -50,7 +50,7 @@ Agent 直接翻译游戏时加载 [FVN 翻译 skill](skills/fvn-translate/SKILL.
    - 公共 Adapter 放在 `src/fvn_translator/adapters/<adapter_id>/`，游戏专属配置和样本可放在对应 FVN 目录。
    - 新 Adapter 必须遵循 `Docs/04-adapter-contract.md` 并通过公共契约测试。
    - 当前已进入 Ren’Py 与 Agent 翻译阶段；历史 Gate A/B 的人工演示缺口记录在实现状态中。
-   - 当前 FVN 目标为 A Role to Play；匹配 Profile 和独立 reference 已接入。
+   - 当前新增 FVN 目标为 The Smoke Room；使用匹配 Profile 和独立 reference，已收录游戏仍保留各自流程。
 
 9. Agent 翻译与交付
    - 未特别指定时，只交付可安装的翻译补丁及说明文件，适用于文件、链接和 Page。必要附件随补丁打包；完整游戏、skill/工具包、源码、工作区和内部验收文件仅在用户明确要求时额外交付。

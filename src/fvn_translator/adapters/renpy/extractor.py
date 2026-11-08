@@ -48,7 +48,12 @@ class RenPyExtractor:
                     f"renpy:{source_file.relative_path}:{node.label}:"
                     f"{node.statement_index}:{node.text_role}"
                 )
-                signature = protection_signature(node.token.value, node.token.raw_content)
+                escape_mode = node.context.get("escape_mode")
+                signature = protection_signature(
+                    node.token.value,
+                    node.token.raw_content,
+                    escape_mode=str(escape_mode) if escape_mode is not None else None,
+                )
                 adapter_data: dict[str, object] = {
                     "node_kind": node.kind,
                     "label": node.label,

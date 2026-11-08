@@ -13,6 +13,8 @@ Agent 处理语义、人物口吻、术语与审校；程序处理定位、分�
 
 确认游戏版本、平台、原文语言和用户目标语言，以及本次接受的翻译、保留和交付范围。语言不局限于英语和中文。下载、解包、真实游戏文本和译文放仓库忽略的 `work/<game>/`，交付文件放忽略的 `output/<game>/<language>/`。
 
+先区分用户直接提供的文本/文件、允许相应复用的开放许可内容，以及仅给出第三方下载链接的作品。下载链接不等于用户直接提供全文；不能据此生成受版权保护作品的整段、整章或全文译本。此时继续完成引擎分析、确定性工具扩展、可处理的通用功能文案和本地手工翻译导出/校验/回写流程，清楚说明剧情未汉化，不发布已生成的长篇草稿。用户直接提供待处理文本后，再按实际内容范围处理；不要用“免费可下载”推定译文分发许可，也不要把本地导出工具当成自动翻译或自动发布功能。
+
 按目标游戏读取匹配 reference：
 
 - 《Remember the Flowers - Part II》：[专属 reference](references/remember-the-flowers-ii.md)。
@@ -20,6 +22,7 @@ Agent 处理语义、人物口吻、术语与审校；程序处理定位、分�
 - 《Khemia》：[专属 reference](references/khemia.md)。
 - 《Interea》：[专属 reference](references/interea.md)。
 - 《A Role to Play》：[专属 reference](references/a-role-to-play.md)。
+- 《The Smoke Room》：[专属 reference](references/the-smoke-room.md)。
 - 其他 FVN：[通用 reference](references/generic.md)。
 
 Echo Project 的专属 reference 共用 [引擎、字体、图像文字与交付流程](references/echo-project-renpy.md)，但分别采用真实包对应的 Profile 和 Ren’Py 版本。只有命中的 reference 及其共用规则需要加载；新游戏的处理要点写入新的 reference，核心流程继续使用本文件。
